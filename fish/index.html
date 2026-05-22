@@ -36,6 +36,27 @@
 <h1>魚カード一覧</h1>
 <p>診断で使っている魚・エビ・貝の特徴をまとめています。メダカはヒーターを使いたくない人向けの選択肢として掲載しています。</p>
 </section><div class="tap-guide fish-card-note"><span aria-hidden="true">🐟</span><span>魚カードでは性格・水温・混泳の目安を確認できます。生体リンクは各カード下部にあります。</span></div>
+<section class="fish-filter-toolbar" id="fish-filter-toolbar" aria-label="魚カード絞り込み">
+<div class="filter-row">
+<strong>環境で絞る</strong>
+<div class="chip-row">
+<button class="filter-chip is-active" data-group="env" data-filter="all" type="button">すべて</button>
+<button class="filter-chip" data-group="env" data-filter="small" type="button">30cm向け</button>
+<button class="filter-chip" data-group="env" data-filter="midup" type="button">45cm以上向け</button>
+<button class="filter-chip" data-group="env" data-filter="noheater" type="button">ヒーターなし候補</button>
+<button class="filter-chip" data-group="env" data-filter="heater" type="button">ヒーター必要</button>
+</div>
+</div>
+<div class="filter-row">
+<strong>難易度で絞る</strong>
+<div class="chip-row">
+<button class="filter-chip is-active" data-group="level" data-filter="all" type="button">すべて</button>
+<button class="filter-chip" data-group="level" data-filter="beginner" type="button">初心者向け（★4以上）</button>
+<button class="filter-chip" data-group="level" data-filter="challenge" type="button">挑戦枠（★3以下）</button>
+</div>
+</div>
+<p class="small-note" id="fish-filter-count"></p>
+</section>
 <section class="fish-grid">
 <article class="fish-card">
 <img alt="ネオンテトラの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/fish/neon.webp"/>
@@ -131,7 +152,8 @@
 <dt>泳ぐ場所</dt><dd>上〜中層</dd>
 <dt>飼い方</dt><dd>主役をじっくり眺める</dd>
 <dt>ヒーター</dt><dd>必要</dd>
-<dt>混泳メモ</dt><dd>基本は単独飼育向き。混泳は個体差が大きく、ヒレの長い魚やエビは狙われることがある。</dd>
+<dt>混泳メモ</dt><dd>基本は単独飼育向き。気性が強めで、混泳は個体差が大きい。ヒレの長い魚やエビは狙われることがある。</dd>
+<dt>水質メモ</dt><dd>急な水温・水質変化に弱りやすい。立ち上げ直後の導入や急変は避ける。</dd>
 </dl>
 <div class="fish-shop-link-wrap">
 <a class="fish-shop-link" href="/comparison/" referrerpolicy="no-referrer-when-downgrade" rel="nofollow" target="_blank">楽天APIでベタ候補を見る</a>
@@ -151,7 +173,8 @@
 <dt>泳ぐ場所</dt><dd>中層</dd>
 <dt>飼い方</dt><dd>大きめの主役魚</dd>
 <dt>ヒーター</dt><dd>必要</dd>
-<dt>混泳メモ</dt><dd>大きくなる主役魚。口に入る小型魚やエビとの混泳は避ける。高さのある水槽でゆったり飼いたい。</dd>
+<dt>混泳メモ</dt><dd>成長に伴って気性が出ることがある。口に入る小型魚やエビとの混泳は避ける。</dd>
+<dt>水質メモ</dt><dd>水質悪化で体調を崩しやすい。ろ過余力と定期換水を前提にしたい。</dd>
 </dl>
 <div class="fish-shop-link-wrap">
 <a class="fish-shop-link" href="/comparison/" referrerpolicy="no-referrer-when-downgrade" rel="nofollow" target="_blank">楽天APIでエンゼルフィッシュ候補を見る</a>
@@ -337,6 +360,27 @@
 <a class="fish-shop-link" href="/comparison/" referrerpolicy="no-referrer-when-downgrade" rel="nofollow" target="_blank">楽天APIで石巻貝候補を見る</a>
 </div>
 </article>
+
+<article class="fish-card">
+<img alt="グリーンネオンテトラの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/>
+<p class="eyebrow">小型群泳魚</p>
+<h2>グリーンネオンテトラ</h2>
+<p>緑青の輝きが水草レイアウトで映える小型群泳魚です。</p>
+<div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">45cm〜</span><span class="badge warn">必要</span></div>
+<dl class="info-list"><dt>泳ぐ場所</dt><dd>中層</dd><dt>飼い方</dt><dd>群れで泳ぐ</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>温和な小型魚と合わせやすい。導入初期の過密は避ける。</dd><dt>水質メモ</dt><dd>水質変化の感受性がやや高め。安定後に少数導入が無難。</dd></dl>
+</article>
+<article class="fish-card"><img alt="ボララスの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">超小型群泳魚</p><h2>ボララス系</h2><p>超小型で繊細な色合いが魅力。小型水槽でも群泳感を楽しめます。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">30cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>中層</dd><dt>飼い方</dt><dd>群れで泳ぐ</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>口の大きい魚との混泳は不向き。極小サイズを意識した相手選びが必要。</dd><dt>水質メモ</dt><dd>急変に弱いため、立ち上げ直後の導入は避ける。</dd></dl></article>
+<article class="fish-card"><img alt="ハニードワーフグラミーの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">主役系</p><h2>ハニードワーフグラミー</h2><p>温和寄りで主役感のあるラビリンスフィッシュ入門種です。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">45cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>上〜中層</dd><dt>飼い方</dt><dd>主役を楽しむ</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>温和な小型魚と候補。同種同士は相性と隠れ家配慮が必要。</dd><dt>水質メモ</dt><dd>水面の油膜や酸欠に注意。弱すぎない水流で管理する。</dd></dl></article>
+<article class="fish-card"><img alt="コリドラス・パンダの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">底もの</p><h2>コリドラス・パンダ</h2><p>白黒模様が人気の小型コリドラスです。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">45cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>底層</dd><dt>飼い方</dt><dd>複数匹で飼う</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>温和な中層魚と合わせやすい。底床は角のない素材が無難。</dd><dt>水質メモ</dt><dd>高水温・悪化した底床に弱い。底の清潔維持が重要。</dd></dl></article>
+<article class="fish-card"><img alt="コリドラス・ピグミーの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">底もの</p><h2>コリドラス・ピグミー</h2><p>超小型で群れ行動が可愛い底ものです。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">30cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>底層〜中層</dd><dt>飼い方</dt><dd>複数匹で飼う</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>大型魚や活発魚との混泳は不向き。小型温和種中心で。</dd><dt>水質メモ</dt><dd>小型ゆえに水質変化の影響を受けやすい。</dd></dl></article>
+<article class="fish-card"><img alt="ランプアイの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">小型群泳魚</p><h2>ランプアイ</h2><p>青い眼が光るように見える上層寄りの群泳魚です。</p><div class="tags"><span class="badge info">初心者向け ★★★★☆</span><span class="badge accent">30cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>上〜中層</dd><dt>飼い方</dt><dd>群れで泳ぐ</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>温和種中心なら混泳しやすい。飛び出し対策でフタ推奨。</dd><dt>水質メモ</dt><dd>極端なpH・水温変化を避ける。</dd></dl></article>
+<article class="fish-card"><img alt="プレコの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">ナマズ・プレコ系</p><h2>プレコ（小型種）</h2><p>コケ取り役として人気だが、種で必要環境が大きく異なります。</p><div class="tags"><span class="badge info">初心者向け ★★☆☆☆</span><span class="badge accent">60cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>底層・壁面</dd><dt>飼い方</dt><dd>単独〜少数</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>種により気性差が大きい。口器で体表をなめる行動に注意。</dd><dt>水質メモ</dt><dd>排泄量が多い種もあり、ろ過能力に余裕が必要。</dd></dl></article>
+<article class="fish-card"><img alt="クラウンキリーの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">卵生メダカ系</p><h2>クラウンキリー</h2><p>上層で映える小型種。落ち着いたレイアウトで魅力が出ます。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">30cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>上層</dd><dt>飼い方</dt><dd>少数〜群れ</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>活発すぎる魚との混泳は避ける。飛び出し防止必須。</dd><dt>水質メモ</dt><dd>急な水流変化と水面環境の悪化に注意。</dd></dl></article>
+<article class="fish-card"><img alt="クーリーローチの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">底もの</p><h2>クーリーローチ</h2><p>細長い体型が特徴の夜行性寄り底ものです。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">45cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>底層</dd><dt>飼い方</dt><dd>複数飼育向き</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>温和種と合わせやすい。隠れ家不足だと落ち着きにくい。</dd><dt>水質メモ</dt><dd>底床汚れ・酸欠に弱い。細目底床と換水管理が重要。</dd></dl></article>
+<article class="fish-card"><img alt="小型レインボーフィッシュの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">レインボーフィッシュ系</p><h2>小型レインボーフィッシュ</h2><p>発色と遊泳性が魅力の群泳魚。泳ぐスペースを広く取りたい種類です。</p><div class="tags"><span class="badge info">初心者向け ★★★☆☆</span><span class="badge accent">60cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>中〜上層</dd><dt>飼い方</dt><dd>群れで泳ぐ</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>俊敏なため、のんびりした魚との混泳は餌競合に注意。</dd><dt>水質メモ</dt><dd>強めのろ過と定期換水で透明感を維持したい。</dd></dl></article>
+<article class="fish-card"><img alt="アピストグラマの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">シクリッド系</p><h2>アピストグラマ系</h2><p>小型シクリッドの代表。繁殖行動と縄張り観察が魅力です。</p><div class="tags"><span class="badge info">初心者向け ★★☆☆☆</span><span class="badge accent">60cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>底〜中層</dd><dt>飼い方</dt><dd>ペア管理</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>繁殖期に気性が強くなる。底ものとの縄張り競合に注意。</dd><dt>水質メモ</dt><dd>水質の感受性が高く、軟水寄り管理を求める種が多い。</dd></dl></article>
+<article class="fish-card"><img alt="ラミレジィの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/hero-fish.webp"/><p class="eyebrow">シクリッド系</p><h2>ラミレジィ</h2><p>発色が美しい小型シクリッド。丁寧な温度・水質管理が前提です。</p><div class="tags"><span class="badge info">初心者向け ★★☆☆☆</span><span class="badge accent">45cm〜</span><span class="badge warn">必要</span></div><dl class="info-list"><dt>泳ぐ場所</dt><dd>中〜底層</dd><dt>飼い方</dt><dd>ペア管理</dd><dt>ヒーター</dt><dd>必要</dd><dt>混泳メモ</dt><dd>温和種中心でも繁殖時は攻撃性が出ることがある。</dd><dt>水質メモ</dt><dd>水温低下や水質悪化に弱い。こまめな観察と換水が重要。</dd></dl></article>
+
 </section>
 <section class="content-card"><h2>魚ごとの詳しい飼い方ガイド</h2><p>各魚カードから、飼い方・水槽サイズ・混泳の注意点を個別ページで確認できます。</p><div class="button-row"><a class="button secondary" href="/guides/">ガイド一覧候補を見る</a><a class="button secondary" href="/combination/">混泳ガイド候補を見る</a></div></section></main>
 <footer class="site-footer">
@@ -350,5 +394,6 @@
 </div>
 </footer>
 <script src="/assets/site.js"></script>
+<script src="/assets/fish-cards.js"></script>
 </body>
 </html>
