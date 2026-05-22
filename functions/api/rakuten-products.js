@@ -1,12 +1,15 @@
 const BASE_REJECT = ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'フィギュア', 'ぬいぐるみ', '犬', '猫', '爬虫類'];
 const LIVE_REJECT = ['生体', '死着', '稚魚', '卵', 'メダカ', 'めだか', 'グッピー', 'プラティ', 'ネオンテトラ', 'ベタ', 'エビ', '貝'];
 const EQUIPMENT_REJECT = ['餌', 'エサ', 'フード', '飼料', 'おやつ', '生体', '死着', '稚魚', '卵'];
+const TANK_PART_REJECT = ['掃除', 'クリーナー', 'ブラシ', 'コケ取り', '水換え', 'ホース', 'ポンプ', 'パイプ', 'ネット', 'フタ', 'ふた', '蓋', 'ガラスフタ', 'カバー', 'マット', 'シート', '水槽台', '交換用', '交換', 'パーツ', '部品', '仕切り', 'バックスクリーン'];
+const FOOD_CONFUSER_REJECT = ['PSB', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', 'ろ材', '底砂', 'ソイル', '砂利', '生体', '死着', '稚魚', '卵'];
 
 const R = (label, category, query, options) => ({ label, category, query, ...options });
 
 const RECIPES = {
   tank_20: R('小型水槽 20cm前後', '水槽', '20cm 水槽 ガラス', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, ...TANK_PART_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご', 'ヒーター', 'ライト', 'フィルター', 'セット'].join(' '),
+    queries: ['20cm 水槽 ガラス', '20センチ 水槽 ガラス', '小型水槽 20cm ガラス'],
     mustGroups: [['水槽'], ['20cm', '20センチ', '20×', '20 x']],
     plus: ['ガラス', 'アクアリウム', 'フレームレス'],
     minPrice: 900,
@@ -15,7 +18,8 @@ const RECIPES = {
     check: '実水量・フタの有無・設置できる奥行きを確認。'
   }),
   tank_30: R('水槽 30cm前後', '水槽', '30cm 水槽 ガラス', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, ...TANK_PART_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご', 'ヒーター', 'ライト', 'フィルター', 'セット'].join(' '),
+    queries: ['30cm 水槽 ガラス', '30センチ 水槽 ガラス', '小型水槽 30cm ガラス'],
     mustGroups: [['水槽'], ['30cm', '30センチ', '30×', '30 x']],
     plus: ['ガラス', 'アクアリウム', 'フレームレス'],
     minPrice: 1500,
@@ -24,7 +28,8 @@ const RECIPES = {
     check: '水槽台・棚の耐荷重、フタの有無、実水量を確認。'
   }),
   tank_45: R('水槽 45cm前後', '水槽', '45cm 水槽 ガラス', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, ...TANK_PART_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご', 'ヒーター', 'ライト', 'フィルター', 'セット'].join(' '),
+    queries: ['45cm 水槽 ガラス', '45センチ 水槽 ガラス'],
     mustGroups: [['水槽'], ['45cm', '45センチ', '45×', '45 x']],
     plus: ['ガラス', 'アクアリウム', 'フレームレス'],
     minPrice: 2500,
@@ -33,7 +38,8 @@ const RECIPES = {
     check: '重量が増えるため、置き場所と耐荷重を確認。'
   }),
   tank_60: R('水槽 60cm前後', '水槽', '60cm 水槽 ガラス', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, ...TANK_PART_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご', 'ヒーター', 'ライト', 'フィルター', 'セット'].join(' '),
+    queries: ['60cm 水槽 ガラス', '60センチ 水槽 ガラス'],
     mustGroups: [['水槽'], ['60cm', '60センチ', '60×', '60 x']],
     plus: ['ガラス', 'アクアリウム', 'フレームレス'],
     minPrice: 4500,
@@ -41,18 +47,20 @@ const RECIPES = {
     why: '魚数・水草・レイアウトの自由度を上げたい人向け。水量が安定しやすい。',
     check: '専用台レベルの耐荷重、設置スペース、メンテ動線を確認。'
   }),
-  filter_low_flow: R('弱水流フィルター', 'フィルター', 'ベタ フィルター 水流 弱い', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト', '餌', 'エサ'].join(' '),
-    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['ベタ', '小型水槽', '水流']],
-    plus: ['外掛け', '投げ込み', '静音', '水流調整'],
+  filter_low_flow: R('弱水流フィルター', 'フィルター', 'ベタ フィルター 水流調整', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', '交換', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト'].join(' '),
+    queries: ['ベタ フィルター 水流調整', 'ベタ 水槽 フィルター 静音', '小型水槽 フィルター 水流調整', '小型水槽 投げ込みフィルター 静音'],
+    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['ベタ', '小型水槽', '水流', '静音', '外掛け', '投げ込み', '小型']],
+    plus: ['外掛け', '投げ込み', '静音', '水流調整', 'ベタ', '小型'],
     minPrice: 700,
     maxPrice: 5000,
     why: 'ベタや稚魚・エビなど、強い水流が苦手な構成で優先。',
     check: '対応水量と水流調整のしやすさを確認。'
   }),
   filter_small: R('小型水槽フィルター', 'フィルター', '30cm 水槽 フィルター', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト', '餌', 'エサ'].join(' '),
-    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['水槽', 'アクアリウム']],
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', '交換', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト'].join(' '),
+    queries: ['30cm 水槽 フィルター', '小型水槽 フィルター 30cm', '30cm アクアリウム ろ過器'],
+    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['水槽', 'アクアリウム', '小型']],
     plus: ['30cm', '外掛け', '投げ込み', '静音', 'GEX', 'テトラ'],
     minPrice: 800,
     maxPrice: 6500,
@@ -60,7 +68,8 @@ const RECIPES = {
     check: '対応水槽サイズ・交換ろ材・水流調整の有無を確認。'
   }),
   filter_medium: R('45〜60cm向けフィルター', 'フィルター', '60cm 水槽 フィルター', {
-    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト', '餌', 'エサ'].join(' '),
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', '交換', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト'].join(' '),
+    queries: ['60cm 水槽 フィルター', '45cm 水槽 フィルター', '60cm アクアリウム ろ過器'],
     mustGroups: [['フィルター', 'ろ過', 'ろ過器', '外掛け', '上部フィルター', '外部フィルター'], ['水槽', 'アクアリウム']],
     plus: ['45cm', '60cm', '静音', 'GEX', 'テトラ', 'コトブキ'],
     minPrice: 1200,
@@ -186,7 +195,8 @@ const RECIPES = {
     check: '農薬・無農薬表記、育成難度、CO2不要か確認。'
   }),
   food_tropical: R('小型熱帯魚の餌', '餌', '小型熱帯魚 餌 フード', {
-    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '金魚', '鯉'].join(' '),
+    ng: [...BASE_REJECT, ...FOOD_CONFUSER_REJECT, '冷凍', '大型魚', '金魚', '鯉'].join(' '),
+    queries: ['小型熱帯魚 餌 フード', '熱帯魚 フード 小型魚', 'グッピー テトラ 餌 フード'],
     mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['熱帯魚', 'グッピー', 'テトラ', '小型魚']],
     plus: ['顆粒', 'フレーク', '浮上性'],
     minPrice: 200,
@@ -195,7 +205,8 @@ const RECIPES = {
     check: '粒サイズと対象魚を確認。'
   }),
   food_betta: R('ベタの餌', '餌', 'ベタ 餌 フード', {
-    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '金魚', '鯉'].join(' '),
+    ng: [...BASE_REJECT, ...FOOD_CONFUSER_REJECT, '冷凍', '大型魚', '金魚', '鯉'].join(' '),
+    queries: ['ベタ 餌 フード', 'ベタ フード 専用', 'ベタ 餌 顆粒'],
     mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['ベタ']],
     plus: ['専用', '顆粒', '浮上性'],
     minPrice: 200,
@@ -204,18 +215,20 @@ const RECIPES = {
     check: '与えすぎ防止のため量と粒サイズを確認。'
   }),
   food_medaka: R('メダカの餌', '餌', 'メダカ 餌 室内', {
-    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '鯉'].join(' '),
+    ng: [...BASE_REJECT, ...FOOD_CONFUSER_REJECT, '冷凍', '大型魚', '鯉'].join(' '),
+    queries: ['メダカ 餌 室内', 'メダカ フード 成魚', 'めだか 餌 成魚', 'メダカ 餌 浮上性'],
     mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['メダカ', 'めだか']],
-    plus: ['室内', '顆粒', '浮上性'],
+    plus: ['室内', '顆粒', '浮上性', '成魚'],
     minPrice: 200,
     maxPrice: 2000,
     why: 'ヒーターなし候補のメダカ水槽向け。',
     check: '室内飼育・成魚/稚魚の対象を確認。'
   }),
-  food_shrimp: R('エビの餌', '餌', 'ミナミヌマエビ 餌 シュリンプフード', {
-    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '金魚'].join(' '),
+  food_shrimp: R('エビの餌', '餌', 'エビ 餌 シュリンプフード', {
+    ng: [...BASE_REJECT, ...FOOD_CONFUSER_REJECT, '冷凍', '大型魚', '金魚'].join(' '),
+    queries: ['エビ 餌 シュリンプフード', 'シュリンプ フード エビ', 'ミナミヌマエビ 餌', 'エビ タブレット 餌'],
     mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['エビ', 'シュリンプ', 'ミナミヌマエビ']],
-    plus: ['沈下性', 'タブレット'],
+    plus: ['沈下性', 'タブレット', 'ヌマエビ'],
     minPrice: 250,
     maxPrice: 2000,
     why: 'エビ中心の水槽で不足しやすい栄養を補う候補。',
@@ -296,6 +309,10 @@ function includesTerm(text, term) {
 
 function matchesAny(text, terms = []) {
   return terms.some((term) => includesTerm(text, term));
+}
+
+function unique(values) {
+  return [...new Set(values.filter(Boolean))];
 }
 
 function pickImage(item) {
@@ -385,48 +402,26 @@ function getRawItems(data) {
   return [];
 }
 
-async function searchOne(recipeId, mode, env, request) {
-  const recipe = RECIPES[recipeId];
-  if (!recipe) return { recipeId, ok: false, error: 'unknown_recipe' };
-
-  const applicationId = env.RAKUTEN_APPLICATION_ID;
-  const accessKey = env.RAKUTEN_ACCESS_KEY;
-  const affiliateId = env.RAKUTEN_AFFILIATE_ID;
-  if (!applicationId || !accessKey) {
-    return {
-      recipeId,
-      ok: false,
-      setupRequired: true,
-      recipe: publicRecipe(recipeId),
-      message: 'RAKUTEN_APPLICATION_ID と RAKUTEN_ACCESS_KEY を Cloudflare の環境変数に設定してください。',
-      fallbackSearchUrl: `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(recipe.query)}/`,
-    };
-  }
-
+async function fetchRakutenItems(recipe, query, mode, env, request, withReviewFlag = false) {
   const params = new URLSearchParams();
-  params.set('applicationId', applicationId);
-  params.set('accessKey', accessKey);
-  if (affiliateId) params.set('affiliateId', affiliateId);
+  params.set('applicationId', env.RAKUTEN_APPLICATION_ID);
+  params.set('accessKey', env.RAKUTEN_ACCESS_KEY);
+  if (env.RAKUTEN_AFFILIATE_ID) params.set('affiliateId', env.RAKUTEN_AFFILIATE_ID);
   params.set('format', 'json');
   params.set('formatVersion', '2');
-  params.set('keyword', recipe.query);
+  params.set('keyword', query);
   params.set('NGKeyword', recipe.ng || '');
   params.set('sort', modeToSort(mode));
   params.set('hits', '30');
   params.set('availability', '1');
   params.set('imageFlag', '1');
-  if (mode !== 'price') params.set('hasReviewFlag', '1');
+  if (withReviewFlag) params.set('hasReviewFlag', '1');
   if (recipe.minPrice) params.set('minPrice', String(recipe.minPrice));
   if (recipe.maxPrice) params.set('maxPrice', String(recipe.maxPrice));
   params.set('elements', 'itemName,itemPrice,itemUrl,affiliateUrl,itemCode,shopName,reviewCount,reviewAverage,mediumImageUrls,smallImageUrls,postageFlag,pointRate');
 
   const origin = new URL(request.url).origin;
   const referer = env.RAKUTEN_REFERER || `${origin}/`;
-  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=6`, request);
-  const cache = caches.default;
-  const cached = await cache.match(cacheKey);
-  if (cached) return await cached.json();
-
   const apiUrl = `${ENDPOINT}?${params.toString()}`;
   const res = await fetch(apiUrl, {
     headers: {
@@ -439,12 +434,61 @@ async function searchOne(recipeId, mode, env, request) {
 
   if (!res.ok) {
     const errorText = await res.text();
-    return { recipeId, ok: false, status: res.status, recipe: publicRecipe(recipeId), error: errorText.slice(0, 500) };
+    return { ok: false, status: res.status, error: errorText.slice(0, 500), items: [] };
   }
 
   const data = await res.json();
-  const rawItems = getRawItems(data);
-  const normalizedItems = rawItems.map(normalizeItem).filter((item) => item.itemName && item.itemUrl);
+  return { ok: true, data, items: getRawItems(data).map(normalizeItem).filter((item) => item.itemName && item.itemUrl) };
+}
+
+async function searchOne(recipeId, mode, env, request) {
+  const recipe = RECIPES[recipeId];
+  if (!recipe) return { recipeId, ok: false, error: 'unknown_recipe' };
+
+  const applicationId = env.RAKUTEN_APPLICATION_ID;
+  const accessKey = env.RAKUTEN_ACCESS_KEY;
+  if (!applicationId || !accessKey) {
+    return {
+      recipeId,
+      ok: false,
+      setupRequired: true,
+      recipe: publicRecipe(recipeId),
+      message: '商品候補を表示する準備中です。',
+      fallbackSearchUrl: `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(recipe.query)}/`,
+    };
+  }
+
+  const origin = new URL(request.url).origin;
+  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=8-safe`, request);
+  const cache = caches.default;
+  const cached = await cache.match(cacheKey);
+  if (cached) return await cached.json();
+
+  const queryList = unique([recipe.query, ...(recipe.queries || [])]);
+  let normalizedItems = [];
+  let firstError = null;
+  let usedQueryCount = 0;
+
+  for (const query of queryList) {
+    const result = await fetchRakutenItems(recipe, query, mode, env, request, false);
+    usedQueryCount += 1;
+    if (!result.ok) {
+      firstError ||= result;
+      if (result.status === 429) break;
+    } else {
+      normalizedItems = normalizedItems.concat(result.items);
+      const enough = normalizedItems
+        .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
+        .filter((item) => item._score > 0);
+      if (dedupeItems(enough).length >= 4) break;
+    }
+    if (queryList.length > 1) await sleep(550);
+  }
+
+  if (!normalizedItems.length && firstError) {
+    return { recipeId, ok: false, status: firstError.status, recipe: publicRecipe(recipeId), error: firstError.error };
+  }
+
   const scoredItems = normalizedItems
     .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
     .filter((item) => item._score > 0);
@@ -456,10 +500,11 @@ async function searchOne(recipeId, mode, env, request) {
     recipeId,
     ok: true,
     recipe: publicRecipe(recipeId),
-    count: data.count ?? data.Count ?? normalizedItems.length,
-    rawCount: rawItems.length,
+    count: normalizedItems.length,
+    rawCount: normalizedItems.length,
     filteredCount: scoredItems.length,
     usedRelaxedFilter: false,
+    usedQueryCount,
     items,
     mode,
   };
@@ -487,3 +532,4 @@ export async function onRequestGet(context) {
 
   return jsonResponse({ ok: true, mode, results, generatedAt: new Date().toISOString() });
 }
+
