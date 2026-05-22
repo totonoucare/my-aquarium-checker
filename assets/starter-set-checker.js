@@ -66,12 +66,12 @@
         <img class="result-fish" src="${escapeHtml(plan.fishImage)}" alt="${escapeHtml(plan.title)}のイメージ" loading="lazy">
       </div>
       <div class="algorithm-box">
-        <h3>このセットの選定ロジック</h3>
+        <h3>このセットの考え方</h3>
         <ol>
-          <li>飼いたい魚・ヒーター可否・置き場所から、水槽プランを先に決定。</li>
-          <li>予算感に応じて「最小・標準・余裕」の1案を最上部に表示。</li>
-          <li>水槽セット商品ではなく、原則として役割ごとに単品候補を出して重複購入を避ける。</li>
-          <li>楽天APIから価格・画像・レビュー付きの商品候補を取得し、除外キーワードと価格帯でノイズを落とす。</li>
+          <li>飼いたい魚・ヒーター可否・置き場所から、無理の少ない水槽プランを選びます。</li>
+          <li>予算感に合わせて「最小・標準・余裕」のうち、今の条件に近い1案を先に表示します。</li>
+          <li>水槽セットに同梱されがちな用品は、買う前に販売ページで重複がないか確認してください。</li>
+          <li>価格やレビューは変動するため、購入前に販売ページの最新情報を確認してください。</li>
         </ol>
       </div>
       ${plan.warnings.map((w) => `<p class="notice-line">⚠️ ${escapeHtml(w)}</p>`).join('')}
@@ -87,16 +87,16 @@
               <option value="rating">高評価順</option>
             </select>
           </label>
-          <button class="button" id="load-products" type="button">楽天APIで候補を取得</button>
+          <button class="button" id="load-products" type="button">商品候補を更新</button>
         </div>
-        <div class="api-note">API未設定でも設計確認はできます。Cloudflareに環境変数を入れると、楽天アフィリURL付き候補が表示されます。</div>
+        <div class="api-note">候補は価格・在庫・レビューが変動します。購入前に販売ページで内容を確認してください。</div>
         <div class="product-results" id="product-results"></div>
       </section>
       <section class="life-section">
         <h3>生体候補</h3>
         <p class="small-note">生体は水槽立ち上げ後、少数ずつ迎える前提です。配送条件・死着保証は販売ページで確認してください。</p>
         <div class="fish-product-grid" id="fish-product-grid"></div>
-        <button class="ghost-button" id="load-fish-products" type="button">生体候補も楽天APIで見る</button>
+        <button class="ghost-button" id="load-fish-products" type="button">生体候補も見る</button>
       </section>
       <details class="compare-tiers">
         <summary>他の価格帯も比較する</summary>
@@ -122,21 +122,20 @@
       const input = document.getElementById('save-url');
       try { await navigator.clipboard.writeText(input.value); alert('診断結果URLをコピーしました'); } catch { input.select(); document.execCommand('copy'); }
     });
-    // Load primary products automatically; keep fish products manual to avoid too many API calls.
     loadProducts(roles, 'product-results', 'balanced');
   }
 
   async function loadProducts(roleIds, targetId, mode) {
     const target = document.getElementById(targetId);
     if (!target || !roleIds.length) return;
-    target.innerHTML = `<p class="loading-line">楽天APIから候補を取得中…</p>`;
+    target.innerHTML = `<p class="loading-line">商品候補を取得中…</p>`;
     const url = `/api/rakuten-products?recipeIds=${encodeURIComponent(roleIds.join(','))}&mode=${encodeURIComponent(mode)}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
       target.innerHTML = (data.results || []).map(renderRecipeResult).join('') || `<p class="small-note">候補が見つかりませんでした。</p>`;
     } catch (err) {
-      target.innerHTML = `<p class="notice-line">商品候補の取得に失敗しました。Cloudflare Functionsの設定を確認してください。</p>`;
+      target.innerHTML = `<p class="notice-line">商品候補を取得できませんでした。時間をおいて再度お試しください。</p>`;
     }
   }
 
@@ -145,14 +144,14 @@
     if (result.setupRequired) {
       return `<article class="recipe-result setup-required">
         <h4>${escapeHtml(r.label)}</h4>
-        <p>${escapeHtml(result.message || '楽天APIの環境変数が未設定です。')}</p>
+        <p>${escapeHtml(result.message || '商品候補を準備中です。')}</p>
         <a class="button ghost" target="_blank" rel="nofollow sponsored noopener" href="${escapeHtml(result.fallbackSearchUrl || '#')}">楽天検索で確認</a>
       </article>`;
     }
     if (!result.ok) {
-      return `<article class="recipe-result"><h4>${escapeHtml(r.label)}</h4><p class="notice-line">取得エラー：${escapeHtml(result.error || result.status || 'unknown')}</p></article>`;
+      return `<article class="recipe-result"><h4>${escapeHtml(r.label)}</h4><p class="notice-line">商品候補を取得できませんでした。時間をおいて再度お試しください。</p></article>`;
     }
-    const cards = (result.items || []).map(renderProductCard).join('') || `<p class="small-note">条件に合う候補が見つかりませんでした。検索レシピの価格帯・除外語を調整してください。</p>`;
+    const cards = (result.items || []).map(renderProductCard).join('') || `<p class="small-note">条件に合う候補が見つかりませんでした。別の価格帯や条件でも確認してみてください。</p>`;
     return `<article class="recipe-result">
       <div class="recipe-head"><h4>${escapeHtml(r.label)}</h4><span>${escapeHtml(r.category || '')}</span></div>
       <p class="selection-reason"><strong>なぜ必要？</strong> ${escapeHtml(r.why || '')}</p>
