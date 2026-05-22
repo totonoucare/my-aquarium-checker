@@ -50,7 +50,7 @@ const RECIPES = {
   filter_low_flow: R('弱水流フィルター', 'フィルター', 'ベタ フィルター 水流調整', {
     ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', '交換', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト'].join(' '),
     queries: ['ベタ フィルター 水流調整', 'ベタ 水槽 フィルター 静音', '小型水槽 フィルター 水流調整', '小型水槽 投げ込みフィルター 静音'],
-    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['ベタ', '小型水槽', '水流', '静音', '外掛け', '投げ込み', '小型']],
+    mustGroups: [['フィルター', 'ろ過', 'ろ過器']],
     plus: ['外掛け', '投げ込み', '静音', '水流調整', 'ベタ', '小型'],
     minPrice: 700,
     maxPrice: 5000,
@@ -409,6 +409,19 @@ function scoreItem(item, recipe) {
   return score;
 }
 
+function apiNgKeyword(recipeId, recipe) {
+  if (['tank_20', 'tank_30', 'tank_45', 'tank_60'].includes(recipeId)) {
+    return ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'フィギュア', 'ぬいぐるみ', '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご'].join(' ');
+  }
+  if (recipeId === 'food_medaka') {
+    return ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'PSB', 'バクテリア', 'カルキ抜き', '水質調整', '卵', '稚魚', '生体'].join(' ');
+  }
+  if (recipeId === 'filter_low_flow') {
+    return ['中古', '訳あり', 'ジャンク', '空容器', '標本', '交換用', 'カートリッジのみ', 'ろ材のみ'].join(' ');
+  }
+  return recipe.ng || '';
+}
+
 function dedupeItems(items) {
   const seen = new Set();
   return items.filter((item) => {
@@ -447,7 +460,7 @@ function getRawItems(data) {
   return [];
 }
 
-async function fetchRakutenItems(recipe, query, mode, env, request, withReviewFlag = false) {
+async function fetchRakutenItems(recipeId, recipe, query, mode, env, request, withReviewFlag = false) {
   const params = new URLSearchParams();
   params.set('applicationId', env.RAKUTEN_APPLICATION_ID);
   params.set('accessKey', env.RAKUTEN_ACCESS_KEY);
@@ -455,7 +468,7 @@ async function fetchRakutenItems(recipe, query, mode, env, request, withReviewFl
   params.set('format', 'json');
   params.set('formatVersion', '2');
   params.set('keyword', query);
-  params.set('NGKeyword', recipe.ng || '');
+  params.set('NGKeyword', apiNgKeyword(recipeId, recipe));
   params.set('sort', modeToSort(mode));
   params.set('hits', '30');
   params.set('availability', '1');
@@ -534,7 +547,7 @@ async function searchOne(recipeId, mode, env, request) {
   let usedQueryCount = 0;
 
   for (const query of queryList) {
-    const result = await fetchRakutenItems(recipe, query, mode, env, request, false);
+    const result = await fetchRakutenItems(recipeId, recipe, query, mode, env, request, false);
     usedQueryCount += 1;
     if (!result.ok) {
       firstError ||= result;
