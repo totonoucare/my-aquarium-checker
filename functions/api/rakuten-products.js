@@ -48,22 +48,31 @@ function splitWords(value) {
   return String(value || '').split(/[\s　]+/).map((s) => s.trim()).filter(Boolean);
 }
 
-function normalizeItem(item) {
-  const image = Array.isArray(item.mediumImageUrls) && item.mediumImageUrls[0]
-    ? (typeof item.mediumImageUrls[0] === 'string' ? item.mediumImageUrls[0] : item.mediumImageUrls[0].imageUrl)
-    : '';
+function pickImage(item) {
+  const candidates = [item.mediumImageUrls, item.smallImageUrls, item.imageUrls].filter(Array.isArray);
+  for (const list of candidates) {
+    if (!list.length) continue;
+    const first = list[0];
+    if (typeof first === 'string') return first;
+    if (first && typeof first === 'object') return first.imageUrl || first.url || '';
+  }
+  return '';
+}
+
+function normalizeItem(entry) {
+  const item = entry && entry.Item ? entry.Item : entry;
   return {
-    itemName: item.itemName || '',
-    itemPrice: item.itemPrice || 0,
-    itemUrl: item.itemUrl || '',
-    affiliateUrl: item.affiliateUrl || item.itemUrl || '',
-    itemCode: item.itemCode || '',
-    shopName: item.shopName || '',
-    reviewCount: item.reviewCount || 0,
-    reviewAverage: item.reviewAverage || 0,
-    postageFlag: item.postageFlag || 0,
-    pointRate: item.pointRate || 1,
-    imageUrl: image,
+    itemName: item?.itemName || '',
+    itemPrice: Number(item?.itemPrice || 0),
+    itemUrl: item?.itemUrl || '',
+    affiliateUrl: item?.affiliateUrl || item?.itemUrl || '',
+    itemCode: item?.itemCode || '',
+    shopName: item?.shopName || '',
+    reviewCount: Number(item?.reviewCount || 0),
+    reviewAverage: Number(item?.reviewAverage || 0),
+    postageFlag: Number(item?.postageFlag || 0),
+    pointRate: Number(item?.pointRate || 1),
+    imageUrl: pickImage(item || {}),
   };
 }
 
@@ -87,6 +96,13 @@ function publicRecipe(id) {
   const r = RECIPES[id];
   if (!r) return null;
   return { id, label: r.label, category: r.category, why: r.why, check: r.check, query: r.query, minPrice: r.minPrice, maxPrice: r.maxPrice };
+}
+
+function getRawItems(data) {
+  if (Array.isArray(data?.items)) return data.items;
+  if (Array.isArray(data?.Items)) return data.Items;
+  if (Array.isArray(data?.results)) return data.results;
+  return [];
 }
 
 async function searchOne(recipeId, mode, env, request) {
@@ -119,14 +135,14 @@ async function searchOne(recipeId, mode, env, request) {
   params.set('hits', '8');
   params.set('availability', '1');
   params.set('imageFlag', '1');
-  params.set('hasReviewFlag', mode === 'price' ? '0' : '1');
+  if (mode !== 'price') params.set('hasReviewFlag', '1');
   if (recipe.minPrice) params.set('minPrice', String(recipe.minPrice));
   if (recipe.maxPrice) params.set('maxPrice', String(recipe.maxPrice));
-  params.set('elements', 'itemName,itemPrice,itemUrl,affiliateUrl,itemCode,shopName,reviewCount,reviewAverage,mediumImageUrls,postageFlag,pointRate');
+  params.set('elements', 'itemName,itemPrice,itemUrl,affiliateUrl,itemCode,shopName,reviewCount,reviewAverage,mediumImageUrls,smallImageUrls,postageFlag,pointRate');
 
   const origin = new URL(request.url).origin;
   const referer = env.RAKUTEN_REFERER || `${origin}/`;
-  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}`, request);
+  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=3`, request);
   const cache = caches.default;
   const cached = await cache.match(cacheKey);
   if (cached) return await cached.json();
@@ -147,12 +163,22 @@ async function searchOne(recipeId, mode, env, request) {
   }
 
   const data = await res.json();
-  const items = (data.items || [])
-    .map(normalizeItem)
-    .filter((item) => passesLocalRules(item, recipe))
-    .slice(0, 4);
+  const rawItems = getRawItems(data);
+  const normalizedItems = rawItems.map(normalizeItem).filter((item) => item.itemName && item.itemUrl);
+  const strictItems = normalizedItems.filter((item) => passesLocalRules(item, recipe)).slice(0, 4);
+  const relaxedItems = normalizedItems.slice(0, 4);
+  const items = strictItems.length ? strictItems : relaxedItems;
 
-  const payload = { recipeId, ok: true, recipe: publicRecipe(recipeId), count: data.count || 0, items, mode };
+  const payload = {
+    recipeId,
+    ok: true,
+    recipe: publicRecipe(recipeId),
+    count: data.count ?? data.Count ?? normalizedItems.length,
+    rawCount: rawItems.length,
+    usedRelaxedFilter: !strictItems.length && relaxedItems.length > 0,
+    items,
+    mode,
+  };
   const response = jsonResponse(payload, 200, { 'cache-control': 'public, max-age=21600' });
   await cache.put(cacheKey, response.clone());
   return payload;
