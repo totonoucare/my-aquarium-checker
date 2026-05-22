@@ -413,7 +413,7 @@ function scoreFoodMedaka(item) {
   const text = norm(`${item.itemName || ''} ${item.shopName || ''}`);
   const medakaTerms = ['メダカ', 'めだか'];
   const foodTerms = ['餌', 'エサ', 'フード', '飼料', '主食'];
-  const rejectTerms = ['psb', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', '生体', '死着', '卵', '稚魚', 'ソイル', '水草', '飼育セット', '水槽セット'];
+  const rejectTerms = ['psb', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', '生体', '死着', 'ソイル', '水草', '飼育セット', '水槽セット'];
 
   if (rejectTerms.some((term) => includesTerm(text, term))) return -999;
   if (!matchesAny(text, medakaTerms)) return -999;
@@ -439,7 +439,7 @@ function apiNgKeyword(recipeId, recipe) {
     return ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'フィギュア', 'ぬいぐるみ', '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご'].join(' ');
   }
   if (recipeId === 'food_medaka') {
-    return ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'PSB', 'バクテリア', 'カルキ抜き', '水質調整', '卵', '稚魚', '生体'].join(' ');
+    return ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'PSB', 'バクテリア', 'カルキ抜き', '水質調整', '生体'].join(' ');
   }
   if (recipeId === 'filter_low_flow') {
     return ['中古', '訳あり', 'ジャンク', '空容器', '標本', '交換用', 'カートリッジのみ', 'ろ材のみ'].join(' ');
@@ -546,7 +546,7 @@ function fallbackItems(normalizedItems, recipe, recipeId) {
 function fallbackFoodMedakaItems(normalizedItems, recipe) {
   return normalizedItems.filter((item) => {
     const text = norm(`${item.itemName || ''} ${item.shopName || ''}`);
-    const hardRejects = ['psb', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', '生体', '死着', '卵', '稚魚', 'ソイル', '水草', '飼育セット', '水槽セット'];
+    const hardRejects = ['psb', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', '生体', '死着', 'ソイル', '水草', '飼育セット', '水槽セット'];
     if (hardRejects.some((term) => includesTerm(text, term))) return false;
     if (!matchesAny(text, ['メダカ', 'めだか'])) return false;
     if (recipe.minPrice && item.itemPrice < recipe.minPrice) return false;
@@ -579,6 +579,9 @@ async function searchOne(recipeId, mode, env, request) {
   if (cached) return await cached.json();
 
   const queryList = unique([recipe.query, ...(recipe.queries || [])]);
+  const preScorer = recipeId === 'food_medaka'
+    ? (item) => scoreFoodMedaka(item)
+    : (item) => scoreItem(item, recipe);
   let normalizedItems = [];
   let firstError = null;
   let usedQueryCount = 0;
@@ -592,7 +595,7 @@ async function searchOne(recipeId, mode, env, request) {
     } else {
       normalizedItems = normalizedItems.concat(result.items);
       const enough = normalizedItems
-        .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
+        .map((item) => ({ ...item, _score: preScorer(item) }))
         .filter((item) => item._score > 0);
       if (dedupeItems(enough).length >= 4) break;
     }
@@ -603,9 +606,7 @@ async function searchOne(recipeId, mode, env, request) {
     return { recipeId, ok: false, status: firstError.status, recipe: publicRecipe(recipeId), error: firstError.error };
   }
 
-  const scorer = recipeId === 'food_medaka'
-    ? (item) => scoreFoodMedaka(item)
-    : (item) => scoreItem(item, recipe);
+  const scorer = preScorer;
   const scoredItems = normalizedItems
     .map((item) => ({ ...item, _score: scorer(item) }))
     .filter((item) => item._score > 0);
