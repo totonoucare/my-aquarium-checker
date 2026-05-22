@@ -36,6 +36,27 @@
 <h1>魚カード一覧</h1>
 <p>診断で使っている魚・エビ・貝の特徴をまとめています。メダカはヒーターを使いたくない人向けの選択肢として掲載しています。</p>
 </section><div class="tap-guide fish-card-note"><span aria-hidden="true">🐟</span><span>魚カードでは性格・水温・混泳の目安を確認できます。生体リンクは各カード下部にあります。</span></div>
+<section class="fish-filter-toolbar" id="fish-filter-toolbar" aria-label="魚カード絞り込み">
+<div class="filter-row">
+<strong>環境で絞る</strong>
+<div class="chip-row">
+<button class="filter-chip is-active" data-group="env" data-filter="all" type="button">すべて</button>
+<button class="filter-chip" data-group="env" data-filter="small" type="button">30cm向け</button>
+<button class="filter-chip" data-group="env" data-filter="midup" type="button">45cm以上向け</button>
+<button class="filter-chip" data-group="env" data-filter="noheater" type="button">ヒーターなし候補</button>
+<button class="filter-chip" data-group="env" data-filter="heater" type="button">ヒーター必要</button>
+</div>
+</div>
+<div class="filter-row">
+<strong>難易度で絞る</strong>
+<div class="chip-row">
+<button class="filter-chip is-active" data-group="level" data-filter="all" type="button">すべて</button>
+<button class="filter-chip" data-group="level" data-filter="beginner" type="button">初心者向け（★4以上）</button>
+<button class="filter-chip" data-group="level" data-filter="challenge" type="button">挑戦枠（★3以下）</button>
+</div>
+</div>
+<p class="small-note" id="fish-filter-count"></p>
+</section>
 <section class="fish-grid">
 <article class="fish-card">
 <img alt="ネオンテトラの飼育イメージ" class="fish-card-media" loading="lazy" src="/assets/media/fish/neon.webp"/>
@@ -350,5 +371,6 @@
 </div>
 </footer>
 <script src="/assets/site.js"></script>
+<script src="/assets/fish-cards.js"></script>
 </body>
 </html>
