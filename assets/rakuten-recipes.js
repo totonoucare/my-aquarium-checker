@@ -260,6 +260,16 @@ window.AQUA_RAKUTEN_RECIPES = {
       "why": "小型魚の群泳を楽しみたい人向け。少数から導入。",
       "check": "匹数・配送条件・水合わせを確認。"
     },
+    "live_green_neon_tetra": {
+      "label": "生体：グリーンネオンテトラ",
+      "category": "生体",
+      "query": "グリーンネオンテトラ 生体 熱帯魚",
+      "ng": "中古 訳あり 標本 フィギュア 餌 フード",
+      "minPrice": 600,
+      "maxPrice": 6000,
+      "why": "青緑の発色を楽しめる小型カラシン。群泳向き。",
+      "check": "匹数・水合わせ・配送条件を確認。"
+    },
     "live_guppy": {
       "label": "生体：グッピー/プラティ",
       "category": "生体",
@@ -341,6 +351,40 @@ window.AQUA_RAKUTEN_RECIPES = {
       "check": "室温帯の適性、混泳相性、匹数を確認。"
     }
   },
+  "fishCategories": {
+    "characin": {
+      "label": "カラシン系",
+      "fishIds": ["live_neon", "live_green_neon_tetra"]
+    },
+    "cichlid": {
+      "label": "シクリッド系",
+      "fishIds": ["live_betta"]
+    },
+    "carp_rasbora": {
+      "label": "コイ・ラスボラ系",
+      "fishIds": ["live_rasbora", "live_white_cloud"]
+    },
+    "medaka_group": {
+      "label": "メダカ系（グッピー・ランプアイ含む）",
+      "fishIds": ["live_medaka", "live_guppy"]
+    },
+    "catfish_pleco": {
+      "label": "ナマズ・プレコ系",
+      "fishIds": ["live_corydoras", "live_otocinclus"]
+    },
+    "anabantoid": {
+      "label": "ベタ・グラミー系（アナバス系）",
+      "fishIds": ["live_betta"]
+    },
+    "rainbowfish": {
+      "label": "レインボーフィッシュ系",
+      "fishIds": []
+    },
+    "utility_species": {
+      "label": "役割生体",
+      "fishIds": ["live_corydoras", "live_otocinclus", "live_yamato", "live_minami"]
+    }
+  },
   "plans": {
     "betta": {
       "title": "ベタ単独水槽",
@@ -392,7 +436,11 @@ window.AQUA_RAKUTEN_RECIPES = {
       "subtitle": "ネオンテトラなどを少数から。30〜45cmで水量とろ過に余裕を。",
       "fishImage": "/assets/media/fish/neon.webp",
       "fishIds": [
-        "live_neon"
+        "live_neon",
+        "live_green_neon_tetra"
+      ],
+      "fishCategoryIds": [
+        "characin"
       ],
       "warnings": [
         "最初から匹数を増やしすぎない。水槽立ち上げ後に少数ずつ導入。",
@@ -439,6 +487,9 @@ window.AQUA_RAKUTEN_RECIPES = {
       "fishIds": [
         "live_guppy"
       ],
+      "fishCategoryIds": [
+        "medaka_group"
+      ],
       "warnings": [
         "グッピー・プラティは増えやすいので、最初の匹数とオスメス構成に注意。",
         "水温・ろ過・掃除用品はケチりすぎない方が安定しやすいです。"
@@ -483,6 +534,9 @@ window.AQUA_RAKUTEN_RECIPES = {
       "fishImage": "/assets/media/fish/minami.webp",
       "fishIds": [
         "live_minami"
+      ],
+      "fishCategoryIds": [
+        "utility_species"
       ],
       "warnings": [
         "エビは薬品・急な水質変化に弱いです。水合わせと農薬付き水草に注意。",
@@ -529,6 +583,9 @@ window.AQUA_RAKUTEN_RECIPES = {
       "fishIds": [
         "live_medaka"
       ],
+      "fishCategoryIds": [
+        "medaka_group"
+      ],
       "warnings": [
         "ヒーターなしでも水温変化はあります。特に夏の高温と冬の低温を確認。",
         "熱帯魚向けセットとは必要条件が変わります。"
@@ -570,8 +627,14 @@ window.AQUA_RAKUTEN_RECIPES = {
       "fishImage": "/assets/media/hero-fish.webp",
       "fishIds": [
         "live_neon",
+        "live_green_neon_tetra",
         "live_guppy",
         "live_minami"
+      ],
+      "fishCategoryIds": [
+        "characin",
+        "medaka_group",
+        "utility_species"
       ],
       "warnings": [
         "60cm水槽は重量が大きいので、専用台・床・メンテ動線を確認。",
