@@ -1,33 +1,271 @@
+const BASE_REJECT = ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'フィギュア', 'ぬいぐるみ', '犬', '猫', '爬虫類'];
+const LIVE_REJECT = ['生体', '死着', '稚魚', '卵', 'メダカ', 'めだか', 'グッピー', 'プラティ', 'ネオンテトラ', 'ベタ', 'エビ', '貝'];
+const EQUIPMENT_REJECT = ['餌', 'エサ', 'フード', '飼料', 'おやつ', '生体', '死着', '稚魚', '卵'];
+
+const R = (label, category, query, options) => ({ label, category, query, ...options });
+
 const RECIPES = {
-  tank_20: { label: '小型水槽 20cm前後', category: '水槽', query: 'ガラス水槽 20cm アクアリウム', ng: '中古 訳あり 金魚鉢 メダカ鉢 プラケース 虫かご', minPrice: 900, maxPrice: 6500, why: 'かなり省スペースで始めたい人向け。水量が少ないので飼育数は控えめに。', check: '実水量・フタの有無・設置できる奥行きを確認。' },
-  tank_30: { label: '水槽 30cm前後', category: '水槽', query: '30cm 水槽 ガラス アクアリウム', ng: '中古 訳あり 金魚鉢 メダカ鉢 セット フィルター付き', minPrice: 1500, maxPrice: 9000, why: 'ベタ・小型魚少数・エビ水槽の入門で扱いやすい標準サイズ。', check: '水槽台・棚の耐荷重、フタの有無、実水量を確認。' },
-  tank_45: { label: '水槽 45cm前後', category: '水槽', query: '45cm 水槽 ガラス アクアリウム', ng: '中古 訳あり 金魚鉢 メダカ鉢 セット フィルター付き', minPrice: 2500, maxPrice: 14000, why: '小型魚の群泳や混泳で、30cmより水量の余裕を取りたい人向け。', check: '重量が増えるため、置き場所と耐荷重を確認。' },
-  tank_60: { label: '水槽 60cm前後', category: '水槽', query: '60cm 水槽 ガラス アクアリウム', ng: '中古 訳あり 金魚鉢 メダカ鉢 セット フィルター付き', minPrice: 4500, maxPrice: 22000, why: '魚数・水草・レイアウトの自由度を上げたい人向け。水量が安定しやすい。', check: '専用台レベルの耐荷重、設置スペース、メンテ動線を確認。' },
-  filter_low_flow: { label: '弱水流フィルター', category: 'フィルター', query: 'ベタ 水流 弱い フィルター 水槽', ng: '中古 訳あり 交換用 ろ材のみ カートリッジのみ 部品', minPrice: 700, maxPrice: 5000, why: 'ベタや稚魚・エビなど、強い水流が苦手な構成で優先。', check: '対応水量と水流調整のしやすさを確認。' },
-  filter_small: { label: '小型水槽フィルター', category: 'フィルター', query: '30cm 水槽 フィルター 外掛け 静音', ng: '中古 訳あり 交換用 ろ材のみ カートリッジのみ 部品', minPrice: 800, maxPrice: 6500, why: '30cm前後の水槽でろ過を確保する基本用品。', check: '対応水槽サイズ・交換ろ材・水流調整の有無を確認。' },
-  filter_medium: { label: '45〜60cm向けフィルター', category: 'フィルター', query: '45cm 60cm 水槽 フィルター 外掛け 静音', ng: '中古 訳あり 交換用 ろ材のみ カートリッジのみ 部品', minPrice: 1200, maxPrice: 9000, why: '魚数が増える水槽で、ろ過能力を確保するための候補。', check: '対応水量、設置幅、交換ろ材の入手性を確認。' },
-  heater_betta: { label: 'ベタ・小型水槽ヒーター', category: 'ヒーター', query: 'ベタ ヒーター 小型水槽 オートヒーター', ng: '中古 訳あり 爬虫類 部品 カバーのみ', minPrice: 900, maxPrice: 6500, why: 'ベタなど熱帯魚の水温管理に。冬場・室温低下がある部屋では重要。', check: '必ず対応水量・設定温度・空焚き防止を確認。' },
-  heater_30: { label: '30cm水槽ヒーター', category: 'ヒーター', query: '30cm 水槽 ヒーター オートヒーター 熱帯魚', ng: '中古 訳あり 爬虫類 部品 カバーのみ', minPrice: 1200, maxPrice: 7000, why: '小型熱帯魚水槽の水温を安定させるための基本用品。', check: '対応水量・W数・安全機能を確認。' },
-  heater_45_60: { label: '45〜60cm水槽ヒーター', category: 'ヒーター', query: '45cm 60cm 水槽 ヒーター 熱帯魚', ng: '中古 訳あり 爬虫類 部品 カバーのみ', minPrice: 1800, maxPrice: 9000, why: '水量のある水槽で水温を安定させる候補。', check: '水量に対してW数不足にならないか確認。' },
-  thermometer: { label: '水温計', category: '水質・管理', query: '水槽 水温計 デジタル アクアリウム', ng: '中古 訳あり 業務用 部品', minPrice: 300, maxPrice: 2500, why: 'ヒーター有無に関わらず、水温確認の基本。', check: '見やすさ・電池式/貼付式・設置方法を確認。' },
-  chlorine_remover: { label: 'カルキ抜き', category: '水質・管理', query: 'アクアリウム カルキ抜き 淡水 水槽', ng: '中古 訳あり 詰め替え 空容器', minPrice: 300, maxPrice: 2500, why: '水換え・立ち上げ時の基本用品。水道水を使うなら必要。', check: '淡水対応、使用量、容量を確認。' },
-  bacteria: { label: 'バクテリア剤', category: '水質・管理', query: '水槽 バクテリア剤 立ち上げ 淡水', ng: '中古 訳あり 海水専用 詰め替え 空容器', minPrice: 500, maxPrice: 3000, why: '立ち上げ初期の不安を下げたい人向け。必須ではないが初心者には安心材料。', check: '淡水対応、使い方、開封後の保管を確認。' },
-  cleaner_small: { label: '小型水槽 掃除用品', category: '掃除', query: '小型水槽 掃除 水換え ポンプ クリーナー', ng: '中古 訳あり 業務用 部品 交換用', minPrice: 500, maxPrice: 3500, why: '水換え・底の汚れ取りに使う基本用品。', check: '水槽サイズに対して大きすぎないか確認。' },
-  net: { label: '魚用ネット', category: '掃除', query: '熱帯魚 ネット 小型 水槽', ng: '中古 訳あり 大型 錦鯉', minPrice: 200, maxPrice: 1500, why: '生体の移動やメンテであると便利。', check: '水槽サイズに合う小さめを選ぶ。' },
-  led_small: { label: '小型水槽LED', category: 'ライト', query: '30cm 水槽 LEDライト アクアリウム', ng: '中古 訳あり 部品 交換用 爬虫類', minPrice: 1000, maxPrice: 7000, why: '観賞性を上げ、生活リズムも作りやすい。水草をやるなら優先度高め。', check: '対応水槽幅、明るさ、タイマー有無を確認。' },
-  led_45_60: { label: '45〜60cm水槽LED', category: 'ライト', query: '45cm 60cm 水槽 LEDライト アクアリウム', ng: '中古 訳あり 部品 交換用 爬虫類', minPrice: 2500, maxPrice: 12000, why: '大きめ水槽や水草レイアウトで見た目を整えたい人向け。', check: '水槽幅への対応、光量、設置方法を確認。' },
-  bottom_sand: { label: '底砂・ソイル', category: 'レイアウト', query: '水槽 底砂 ソイル 初心者 淡水', ng: '中古 訳あり 海水 サンゴ砂 メダカ鉢', minPrice: 600, maxPrice: 3500, why: '見た目と水草・生体の落ち着きに関わる。', check: '水質に影響するタイプか、必要量が水槽に合うか確認。' },
-  hideout: { label: '隠れ家・シェルター', category: 'レイアウト', query: '水槽 隠れ家 シェルター ベタ エビ', ng: '中古 訳あり 爬虫類 大型', minPrice: 400, maxPrice: 2500, why: 'ベタ・エビ・小型魚のストレス軽減と見た目づくりに。', check: '角が鋭すぎないか、魚が挟まらないか確認。' },
-  water_plants: { label: '初心者向け水草', category: 'レイアウト', query: '水草 初心者 アヌビアス ウィローモス 水槽', ng: '中古 訳あり 種子 タネ 海藻', minPrice: 500, maxPrice: 3500, why: 'エビ・小型魚の隠れ家にもなり、見た目を整えやすい。', check: '農薬・無農薬表記、育成難度、CO2不要か確認。' },
-  food_tropical: { label: '小型熱帯魚の餌', category: '餌', query: '小型熱帯魚 餌 フード テトラ グッピー', ng: '中古 訳あり 大型魚 金魚 鯉 冷凍', minPrice: 250, maxPrice: 1800, why: 'ネオンテトラ・グッピー等の入門水槽に。', check: '粒サイズと対象魚を確認。' },
-  food_betta: { label: 'ベタの餌', category: '餌', query: 'ベタ 餌 フード', ng: '中古 訳あり 大型魚 金魚 鯉 冷凍', minPrice: 250, maxPrice: 1800, why: 'ベタ専用またはベタ向けの粒サイズを優先。', check: '与えすぎ防止のため量と粒サイズを確認。' },
-  food_medaka: { label: 'メダカの餌', category: '餌', query: 'メダカ 餌 室内 水槽', ng: '中古 訳あり 大型魚 鯉 冷凍', minPrice: 250, maxPrice: 1800, why: 'ヒーターなし候補のメダカ水槽向け。', check: '室内飼育・成魚/稚魚の対象を確認。' },
-  food_shrimp: { label: 'エビの餌', category: '餌', query: 'ミナミヌマエビ 餌 シュリンプフード', ng: '中古 訳あり 大型魚 金魚 冷凍', minPrice: 300, maxPrice: 1800, why: 'エビ中心の水槽で不足しやすい栄養を補う候補。', check: 'ミナミヌマエビ等の対象を確認。' },
-  live_betta: { label: '生体：ベタ', category: '生体', query: 'ベタ 生体 オス 熱帯魚', ng: '中古 訳あり 標本 フィギュア 餌 フード', minPrice: 800, maxPrice: 7000, why: '単独飼育で観賞しやすい人気種。', check: '配送条件・死着保証・到着後の水合わせを確認。' },
-  live_neon: { label: '生体：ネオンテトラ', category: '生体', query: 'ネオンテトラ 生体 熱帯魚', ng: '中古 訳あり 標本 フィギュア 餌 フード', minPrice: 500, maxPrice: 5000, why: '小型魚の群泳を楽しみたい人向け。少数から導入。', check: '匹数・配送条件・水合わせを確認。' },
-  live_guppy: { label: '生体：グッピー/プラティ', category: '生体', query: 'グッピー プラティ 生体 熱帯魚', ng: '中古 訳あり 標本 フィギュア 餌 フード', minPrice: 600, maxPrice: 6000, why: '色味を楽しみやすい入門候補。繁殖しやすい点に注意。', check: 'オスメス構成・増えやすさ・配送条件を確認。' },
-  live_medaka: { label: '生体：メダカ', category: '生体', query: 'メダカ 生体 室内 水槽', ng: '中古 訳あり 標本 フィギュア 餌 フード', minPrice: 500, maxPrice: 6000, why: 'ヒーターなし候補。屋内外どちらも検討しやすい。', check: '品種・匹数・季節の配送条件を確認。' },
-  live_minami: { label: '生体：ミナミヌマエビ', category: '生体', query: 'ミナミヌマエビ 生体', ng: '中古 訳あり 標本 フィギュア 餌 フード', minPrice: 500, maxPrice: 4000, why: 'コケ取り補助・水草水槽の入門候補。', check: '農薬付き水草との相性、配送条件を確認。' }
+  tank_20: R('小型水槽 20cm前後', '水槽', '20cm 水槽 ガラス', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    mustGroups: [['水槽'], ['20cm', '20センチ', '20×', '20 x']],
+    plus: ['ガラス', 'アクアリウム', 'フレームレス'],
+    minPrice: 900,
+    maxPrice: 6500,
+    why: 'かなり省スペースで始めたい人向け。水量が少ないので飼育数は控えめに。',
+    check: '実水量・フタの有無・設置できる奥行きを確認。'
+  }),
+  tank_30: R('水槽 30cm前後', '水槽', '30cm 水槽 ガラス', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    mustGroups: [['水槽'], ['30cm', '30センチ', '30×', '30 x']],
+    plus: ['ガラス', 'アクアリウム', 'フレームレス'],
+    minPrice: 1500,
+    maxPrice: 9000,
+    why: 'ベタ・小型魚少数・エビ水槽の入門で扱いやすい標準サイズ。',
+    check: '水槽台・棚の耐荷重、フタの有無、実水量を確認。'
+  }),
+  tank_45: R('水槽 45cm前後', '水槽', '45cm 水槽 ガラス', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    mustGroups: [['水槽'], ['45cm', '45センチ', '45×', '45 x']],
+    plus: ['ガラス', 'アクアリウム', 'フレームレス'],
+    minPrice: 2500,
+    maxPrice: 14000,
+    why: '小型魚の群泳や混泳で、30cmより水量の余裕を取りたい人向け。',
+    check: '重量が増えるため、置き場所と耐荷重を確認。'
+  }),
+  tank_60: R('水槽 60cm前後', '水槽', '60cm 水槽 ガラス', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '金魚鉢', 'メダカ鉢', 'プラケース', 'ヒーター', 'ライト', 'フィルター', 'ポンプ', 'セット'].join(' '),
+    mustGroups: [['水槽'], ['60cm', '60センチ', '60×', '60 x']],
+    plus: ['ガラス', 'アクアリウム', 'フレームレス'],
+    minPrice: 4500,
+    maxPrice: 22000,
+    why: '魚数・水草・レイアウトの自由度を上げたい人向け。水量が安定しやすい。',
+    check: '専用台レベルの耐荷重、設置スペース、メンテ動線を確認。'
+  }),
+  filter_low_flow: R('弱水流フィルター', 'フィルター', 'ベタ フィルター 水流 弱い', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト', '餌', 'エサ'].join(' '),
+    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['ベタ', '小型水槽', '水流']],
+    plus: ['外掛け', '投げ込み', '静音', '水流調整'],
+    minPrice: 700,
+    maxPrice: 5000,
+    why: 'ベタや稚魚・エビなど、強い水流が苦手な構成で優先。',
+    check: '対応水量と水流調整のしやすさを確認。'
+  }),
+  filter_small: R('小型水槽フィルター', 'フィルター', '30cm 水槽 フィルター', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト', '餌', 'エサ'].join(' '),
+    mustGroups: [['フィルター', 'ろ過', 'ろ過器'], ['水槽', 'アクアリウム']],
+    plus: ['30cm', '外掛け', '投げ込み', '静音', 'GEX', 'テトラ'],
+    minPrice: 800,
+    maxPrice: 6500,
+    why: '30cm前後の水槽でろ過を確保する基本用品。',
+    check: '対応水槽サイズ・交換ろ材・水流調整の有無を確認。'
+  }),
+  filter_medium: R('45〜60cm向けフィルター', 'フィルター', '60cm 水槽 フィルター', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '交換用', 'カートリッジのみ', 'ろ材のみ', 'ヒーター', 'ライト', '餌', 'エサ'].join(' '),
+    mustGroups: [['フィルター', 'ろ過', 'ろ過器', '外掛け', '上部フィルター', '外部フィルター'], ['水槽', 'アクアリウム']],
+    plus: ['45cm', '60cm', '静音', 'GEX', 'テトラ', 'コトブキ'],
+    minPrice: 1200,
+    maxPrice: 12000,
+    why: '魚数が増える水槽で、ろ過能力を確保するための候補。',
+    check: '対応水量、設置幅、交換ろ材の入手性を確認。'
+  }),
+  heater_betta: R('ベタ・小型水槽ヒーター', 'ヒーター', 'ベタ 小型水槽 ヒーター', {
+    ng: [...BASE_REJECT, '生体', '死着', '稚魚', '卵', '餌', 'エサ', 'フード', 'カバーのみ', '部品'].join(' '),
+    mustGroups: [['ヒーター', 'オートヒーター'], ['ベタ', '小型水槽', '水槽']],
+    plus: ['安全', '空焚き', '26℃', '温度固定'],
+    minPrice: 900,
+    maxPrice: 6500,
+    why: 'ベタなど熱帯魚の水温管理に。冬場・室温低下がある部屋では重要。',
+    check: '必ず対応水量・設定温度・空焚き防止を確認。'
+  }),
+  heater_30: R('30cm水槽ヒーター', 'ヒーター', '30cm 水槽 ヒーター', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, 'カバーのみ', '部品', 'ライト', '水温計のみ'].join(' '),
+    mustGroups: [['ヒーター', 'オートヒーター'], ['水槽', 'アクアリウム', '熱帯魚']],
+    plus: ['30cm', '安全', '空焚き', '温度固定'],
+    minPrice: 1200,
+    maxPrice: 7000,
+    why: '小型熱帯魚水槽の水温を安定させるための基本用品。',
+    check: '対応水量・W数・安全機能を確認。'
+  }),
+  heater_45_60: R('45〜60cm水槽ヒーター', 'ヒーター', '60cm 水槽 ヒーター', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, 'カバーのみ', '部品', 'ライト', '水温計のみ'].join(' '),
+    mustGroups: [['ヒーター', 'オートヒーター'], ['水槽', 'アクアリウム', '熱帯魚']],
+    plus: ['45cm', '60cm', '100W', '150W', '安全', '空焚き'],
+    minPrice: 1800,
+    maxPrice: 9000,
+    why: '水量のある水槽で水温を安定させる候補。',
+    check: '水量に対してW数不足にならないか確認。'
+  }),
+  thermometer: R('水温計', '水質・管理', '水槽 水温計 デジタル', {
+    ng: [...BASE_REJECT, 'ヒーター', '生体', '餌', 'エサ', 'フード'].join(' '),
+    mustGroups: [['水温計', '温度計'], ['水槽', 'アクアリウム', '熱帯魚']],
+    plus: ['デジタル', 'LCD', 'サーモ', '貼る'],
+    minPrice: 250,
+    maxPrice: 2500,
+    why: 'ヒーター有無に関わらず、水温確認の基本。',
+    check: '見やすさ・電池式/貼付式・設置方法を確認。'
+  }),
+  chlorine_remover: R('カルキ抜き', '水質・管理', 'カルキ抜き 水槽 淡水', {
+    ng: [...BASE_REJECT, ...LIVE_REJECT, '餌', 'エサ', 'フード', 'ろ材', '底砂', 'ソイル', 'ヒーター', 'ライト'].join(' '),
+    mustGroups: [['カルキ抜き', '塩素中和', '中和剤', '塩素'], ['水槽', 'アクアリウム', '淡水', '観賞魚']],
+    plus: ['テトラ', 'GEX', 'コトブキ', '水質調整'],
+    minPrice: 250,
+    maxPrice: 2500,
+    why: '水換え・立ち上げ時の基本用品。水道水を使うなら必要。',
+    check: '淡水対応、使用量、容量を確認。'
+  }),
+  bacteria: R('バクテリア剤', '水質・管理', '水槽 バクテリア剤 淡水', {
+    ng: [...BASE_REJECT, ...LIVE_REJECT, '餌', 'エサ', 'フード', 'ろ材のみ', '海水専用'].join(' '),
+    mustGroups: [['バクテリア', '硝化菌', 'PSB'], ['水槽', 'アクアリウム', '淡水']],
+    plus: ['立ち上げ', '水質', 'ろ過'],
+    minPrice: 400,
+    maxPrice: 3500,
+    why: '立ち上げ初期の不安を下げたい人向け。必須ではないが初心者には安心材料。',
+    check: '淡水対応、使い方、開封後の保管を確認。'
+  }),
+  cleaner_small: R('小型水槽 掃除用品', '掃除', '小型水槽 掃除 クリーナー', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '業務用', '部品', '交換用'].join(' '),
+    mustGroups: [['掃除', 'クリーナー', '水換え', 'ポンプ', 'サイフォン', 'スポイト'], ['水槽', 'アクアリウム']],
+    plus: ['小型', '底砂', 'ホース'],
+    minPrice: 400,
+    maxPrice: 3500,
+    why: '水換え・底の汚れ取りに使う基本用品。',
+    check: '水槽サイズに対して大きすぎないか確認。'
+  }),
+  net: R('魚用ネット', '掃除', '熱帯魚 ネット 小型', {
+    ng: [...BASE_REJECT, '大型', '錦鯉', '虫取り', '昆虫'].join(' '),
+    mustGroups: [['ネット', '網'], ['熱帯魚', '観賞魚', '水槽', 'メダカ']],
+    plus: ['小型', 'やわらかい'],
+    minPrice: 150,
+    maxPrice: 1500,
+    why: '生体の移動やメンテであると便利。',
+    check: '水槽サイズに合う小さめを選ぶ。'
+  }),
+  led_small: R('小型水槽LED', 'ライト', '30cm 水槽 LEDライト', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '電球のみ', '部品', '爬虫類'].join(' '),
+    mustGroups: [['LED', 'ライト', '照明'], ['水槽', 'アクアリウム']],
+    plus: ['30cm', '小型', '水草', 'タイマー'],
+    minPrice: 900,
+    maxPrice: 8000,
+    why: '観賞性を上げ、生活リズムも作りやすい。水草をやるなら優先度高め。',
+    check: '対応水槽幅、明るさ、タイマー有無を確認。'
+  }),
+  led_45_60: R('45〜60cm水槽LED', 'ライト', '60cm 水槽 LEDライト', {
+    ng: [...BASE_REJECT, ...EQUIPMENT_REJECT, '電球のみ', '部品', '爬虫類'].join(' '),
+    mustGroups: [['LED', 'ライト', '照明'], ['水槽', 'アクアリウム']],
+    plus: ['45cm', '60cm', '水草', 'タイマー'],
+    minPrice: 2000,
+    maxPrice: 14000,
+    why: '大きめ水槽や水草レイアウトで見た目を整えたい人向け。',
+    check: '水槽幅への対応、光量、設置方法を確認。'
+  }),
+  bottom_sand: R('底砂・ソイル', 'レイアウト', '水槽 ソイル 底砂', {
+    ng: [...BASE_REJECT, '生体', '死着', '餌', 'エサ', 'フード', 'フィルター', 'ヒーター', 'ライト', 'ろ材', 'サンゴ砂', '海水'].join(' '),
+    mustGroups: [['底砂', 'ソイル', '砂利', 'サンド'], ['水槽', 'アクアリウム', '熱帯魚', 'メダカ']],
+    plus: ['淡水', '水草', '低床', '立ち上げ'],
+    minPrice: 500,
+    maxPrice: 4500,
+    why: '見た目と水草・生体の落ち着きに関わる。',
+    check: '水質に影響するタイプか、必要量が水槽に合うか確認。'
+  }),
+  hideout: R('隠れ家・シェルター', 'レイアウト', '水槽 隠れ家 シェルター', {
+    ng: [...BASE_REJECT, '生体', '死着', '餌', 'エサ', 'フード', '爬虫類', '大型'].join(' '),
+    mustGroups: [['隠れ家', 'シェルター', '土管', 'ハウス'], ['水槽', 'アクアリウム', 'ベタ', 'エビ']],
+    plus: ['小型', '陶器', 'レイアウト'],
+    minPrice: 350,
+    maxPrice: 3000,
+    why: 'ベタ・エビ・小型魚のストレス軽減と見た目づくりに。',
+    check: '角が鋭すぎないか、魚が挟まらないか確認。'
+  }),
+  water_plants: R('初心者向け水草', 'レイアウト', '水草 初心者 アヌビアス', {
+    ng: [...BASE_REJECT, '種子', 'タネ', '種', '海藻', '造花', '人工'].join(' '),
+    mustGroups: [['水草', 'アヌビアス', 'ウィローモス', 'マツモ', 'ミクロソリウム']],
+    plus: ['初心者', 'CO2不要', '無農薬', '活着'],
+    minPrice: 400,
+    maxPrice: 4000,
+    why: 'エビ・小型魚の隠れ家にもなり、見た目を整えやすい。',
+    check: '農薬・無農薬表記、育成難度、CO2不要か確認。'
+  }),
+  food_tropical: R('小型熱帯魚の餌', '餌', '小型熱帯魚 餌 フード', {
+    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '金魚', '鯉'].join(' '),
+    mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['熱帯魚', 'グッピー', 'テトラ', '小型魚']],
+    plus: ['顆粒', 'フレーク', '浮上性'],
+    minPrice: 200,
+    maxPrice: 2000,
+    why: 'ネオンテトラ・グッピー等の入門水槽に。',
+    check: '粒サイズと対象魚を確認。'
+  }),
+  food_betta: R('ベタの餌', '餌', 'ベタ 餌 フード', {
+    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '金魚', '鯉'].join(' '),
+    mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['ベタ']],
+    plus: ['専用', '顆粒', '浮上性'],
+    minPrice: 200,
+    maxPrice: 2000,
+    why: 'ベタ専用またはベタ向けの粒サイズを優先。',
+    check: '与えすぎ防止のため量と粒サイズを確認。'
+  }),
+  food_medaka: R('メダカの餌', '餌', 'メダカ 餌 室内', {
+    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '鯉'].join(' '),
+    mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['メダカ', 'めだか']],
+    plus: ['室内', '顆粒', '浮上性'],
+    minPrice: 200,
+    maxPrice: 2000,
+    why: 'ヒーターなし候補のメダカ水槽向け。',
+    check: '室内飼育・成魚/稚魚の対象を確認。'
+  }),
+  food_shrimp: R('エビの餌', '餌', 'ミナミヌマエビ 餌 シュリンプフード', {
+    ng: [...BASE_REJECT, '生体', '死着', '冷凍', '大型魚', '金魚'].join(' '),
+    mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['エビ', 'シュリンプ', 'ミナミヌマエビ']],
+    plus: ['沈下性', 'タブレット'],
+    minPrice: 250,
+    maxPrice: 2000,
+    why: 'エビ中心の水槽で不足しやすい栄養を補う候補。',
+    check: 'ミナミヌマエビ等の対象を確認。'
+  }),
+  live_betta: R('生体：ベタ', '生体', 'ベタ 生体 熱帯魚', {
+    ng: [...BASE_REJECT, '餌', 'エサ', 'フード', '水槽', 'ヒーター', 'ライト'].join(' '),
+    mustGroups: [['ベタ'], ['生体', '販売', '熱帯魚']],
+    plus: ['オス', 'メス', '死着保証'],
+    minPrice: 800,
+    maxPrice: 7000,
+    why: '単独飼育で観賞しやすい人気種。',
+    check: '配送条件・死着保証・到着後の水合わせを確認。'
+  }),
+  live_neon: R('生体：ネオンテトラ', '生体', 'ネオンテトラ 生体 熱帯魚', {
+    ng: [...BASE_REJECT, '餌', 'エサ', 'フード', '水槽', 'ヒーター', 'ライト'].join(' '),
+    mustGroups: [['ネオンテトラ'], ['生体', '販売', '熱帯魚']],
+    plus: ['死着保証', '匹'],
+    minPrice: 500,
+    maxPrice: 5000,
+    why: '小型魚の群泳を楽しみたい人向け。少数から導入。',
+    check: '匹数・配送条件・水合わせを確認。'
+  }),
+  live_guppy: R('生体：グッピー/プラティ', '生体', 'グッピー プラティ 生体', {
+    ng: [...BASE_REJECT, '餌', 'エサ', 'フード', '水槽', 'ヒーター', 'ライト'].join(' '),
+    mustGroups: [['グッピー', 'プラティ'], ['生体', '販売', '熱帯魚']],
+    plus: ['ミックス', '死着保証', '匹'],
+    minPrice: 600,
+    maxPrice: 6000,
+    why: '色味を楽しみやすい入門候補。繁殖しやすい点に注意。',
+    check: 'オスメス構成・増えやすさ・配送条件を確認。'
+  }),
+  live_medaka: R('生体：メダカ', '生体', 'メダカ 生体 室内', {
+    ng: [...BASE_REJECT, '餌', 'エサ', 'フード', '水槽', 'カルキ抜き', 'ライト'].join(' '),
+    mustGroups: [['メダカ', 'めだか'], ['生体', '販売']],
+    plus: ['死着保証', '匹', '室内'],
+    minPrice: 500,
+    maxPrice: 6000,
+    why: 'ヒーターなし候補。屋内外どちらも検討しやすい。',
+    check: '品種・匹数・季節の配送条件を確認。'
+  }),
+  live_minami: R('生体：ミナミヌマエビ', '生体', 'ミナミヌマエビ 生体', {
+    ng: [...BASE_REJECT, '餌', 'エサ', 'フード', '水槽', 'カルキ抜き', 'ライト'].join(' '),
+    mustGroups: [['ミナミヌマエビ', 'ヌマエビ'], ['生体', '販売']],
+    plus: ['死着保証', '匹'],
+    minPrice: 500,
+    maxPrice: 4000,
+    why: 'コケ取り補助・水草水槽の入門候補。',
+    check: '農薬付き水草との相性、配送条件を確認。'
+  })
 };
 
 const ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260401';
@@ -44,8 +282,20 @@ function jsonResponse(body, status = 200, headers = {}) {
   });
 }
 
-function splitWords(value) {
+function words(value) {
   return String(value || '').split(/[\s　]+/).map((s) => s.trim()).filter(Boolean);
+}
+
+function norm(value) {
+  return String(value || '').normalize('NFKC').toLowerCase().replace(/[\s　・_\-―ー]+/g, '');
+}
+
+function includesTerm(text, term) {
+  return text.includes(norm(term));
+}
+
+function matchesAny(text, terms = []) {
+  return terms.some((term) => includesTerm(text, term));
 }
 
 function pickImage(item) {
@@ -76,20 +326,50 @@ function normalizeItem(entry) {
   };
 }
 
-function passesLocalRules(item, recipe) {
-  const text = `${item.itemName || ''} ${item.shopName || ''}`.toLowerCase();
-  const exclude = splitWords(recipe.ng).map((w) => w.toLowerCase());
-  if (exclude.some((w) => text.includes(w))) return false;
-  if (recipe.minPrice && item.itemPrice < recipe.minPrice) return false;
-  if (recipe.maxPrice && item.itemPrice > recipe.maxPrice) return false;
-  return true;
+function scoreItem(item, recipe) {
+  const text = norm(`${item.itemName || ''} ${item.shopName || ''}`);
+  const rejects = words(recipe.ng);
+  if (rejects.some((term) => includesTerm(text, term))) return -999;
+  if (recipe.minPrice && item.itemPrice < recipe.minPrice) return -999;
+  if (recipe.maxPrice && item.itemPrice > recipe.maxPrice) return -999;
+
+  let score = 0;
+  for (const group of recipe.mustGroups || []) {
+    if (!matchesAny(text, group)) return -999;
+    score += 8;
+  }
+  for (const term of recipe.plus || []) {
+    if (includesTerm(text, term)) score += 2;
+  }
+  score += Math.min(item.reviewCount || 0, 100) / 50;
+  score += Math.max(0, (item.reviewAverage || 0) - 3) * 0.5;
+  if (item.postageFlag === 0) score += 0.5;
+  return score;
+}
+
+function dedupeItems(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = item.itemCode || norm(item.itemName).slice(0, 80);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function modeToSort(mode) {
   if (mode === 'price') return '+itemPrice';
   if (mode === 'rating') return '-reviewAverage';
   if (mode === 'review') return '-reviewCount';
-  return '-reviewCount';
+  return 'standard';
+}
+
+function sortLocally(items, mode) {
+  const copy = [...items];
+  if (mode === 'price') return copy.sort((a, b) => a.itemPrice - b.itemPrice);
+  if (mode === 'rating') return copy.sort((a, b) => (b.reviewAverage - a.reviewAverage) || (b.reviewCount - a.reviewCount));
+  if (mode === 'review') return copy.sort((a, b) => (b.reviewCount - a.reviewCount) || (b.reviewAverage - a.reviewAverage));
+  return copy.sort((a, b) => (b._score - a._score) || (b.reviewCount - a.reviewCount));
 }
 
 function publicRecipe(id) {
@@ -132,7 +412,7 @@ async function searchOne(recipeId, mode, env, request) {
   params.set('keyword', recipe.query);
   params.set('NGKeyword', recipe.ng || '');
   params.set('sort', modeToSort(mode));
-  params.set('hits', '8');
+  params.set('hits', '30');
   params.set('availability', '1');
   params.set('imageFlag', '1');
   if (mode !== 'price') params.set('hasReviewFlag', '1');
@@ -142,7 +422,7 @@ async function searchOne(recipeId, mode, env, request) {
 
   const origin = new URL(request.url).origin;
   const referer = env.RAKUTEN_REFERER || `${origin}/`;
-  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=3`, request);
+  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=6`, request);
   const cache = caches.default;
   const cached = await cache.match(cacheKey);
   if (cached) return await cached.json();
@@ -165,9 +445,12 @@ async function searchOne(recipeId, mode, env, request) {
   const data = await res.json();
   const rawItems = getRawItems(data);
   const normalizedItems = rawItems.map(normalizeItem).filter((item) => item.itemName && item.itemUrl);
-  const strictItems = normalizedItems.filter((item) => passesLocalRules(item, recipe)).slice(0, 4);
-  const relaxedItems = normalizedItems.slice(0, 4);
-  const items = strictItems.length ? strictItems : relaxedItems;
+  const scoredItems = normalizedItems
+    .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
+    .filter((item) => item._score > 0);
+  const items = sortLocally(dedupeItems(scoredItems), mode)
+    .slice(0, 4)
+    .map(({ _score, ...item }) => item);
 
   const payload = {
     recipeId,
@@ -175,7 +458,8 @@ async function searchOne(recipeId, mode, env, request) {
     recipe: publicRecipe(recipeId),
     count: data.count ?? data.Count ?? normalizedItems.length,
     rawCount: rawItems.length,
-    usedRelaxedFilter: !strictItems.length && relaxedItems.length > 0,
+    filteredCount: scoredItems.length,
+    usedRelaxedFilter: false,
     items,
     mode,
   };
