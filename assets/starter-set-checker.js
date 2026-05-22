@@ -9,15 +9,50 @@
   const DESIRED_TO_PLAN = {
     unknown: 'shoal', betta: 'betta', shoal: 'shoal', colorful: 'guppy', shrimp: 'shrimp', noheater: 'medaka', big: 'community60'
   };
+  const ENTRY_LABELS = {
+    species: '生体から逆算',
+    space: '置き場所から逆算',
+    style: '雰囲気・管理しやすさから逆算',
+    none: 'おまかせ'
+  };
 
   const form = document.getElementById('starter-form');
   const result = document.getElementById('starter-result');
   if (!form || !result) return;
 
   function pickPlanId(values) {
+    if (values.entry === 'species') {
+      return DESIRED_TO_PLAN[values.desired] || 'shoal';
+    }
     if (values.heater === 'no' && values.desired !== 'betta' && values.desired !== 'shrimp') return 'medaka';
     if (values.space === 'roomy' && values.desired === 'unknown') return 'community60';
     return DESIRED_TO_PLAN[values.desired] || 'shoal';
+  }
+
+  function buildSpeciesAdvice(values) {
+    const recommended = [];
+    const avoid = [];
+
+    if (values.heater === 'no') {
+      recommended.push('アカヒレ', 'メダカ', 'ミナミヌマエビ');
+      avoid.push('グリーンネオンテトラ（ヒーター前提）', 'ベタ（低温管理が難しい）');
+    } else if (values.desired === 'betta') {
+      recommended.push('ベタ単独飼育', '石巻貝（相性確認のうえ補助役）');
+      avoid.push('追いかけ行動が出やすい小型魚との安易な混泳');
+    } else if (values.desired === 'shoal') {
+      recommended.push('ネオンテトラ', 'グリーンネオンテトラ', 'ラスボラ系');
+      avoid.push('導入初期の過密投入');
+    } else {
+      recommended.push('アカヒレ', 'グッピー', 'コリドラス・ピグミー');
+      avoid.push('管理頻度に対して過密な匹数設定');
+    }
+
+    if (values.care === 'easy') {
+      recommended.push('石巻貝（コケ取り補助）');
+      avoid.push('高難度な水草メインレイアウトの同時スタート');
+    }
+
+    return { recommended: [...new Set(recommended)], avoid: [...new Set(avoid)] };
   }
 
   function pickTier(values) {
@@ -61,6 +96,7 @@
     const roles = plan.tiers[tier] || [];
     const altTiers = ['low', 'standard', 'premium'].filter((t) => t !== tier);
     const fishRoleIds = resolveFishRoleIds(planId, plan);
+    const speciesAdvice = buildSpeciesAdvice(values);
     const params = new URLSearchParams(values);
     params.set('plan', planId); params.set('tier', tier);
     const saveUrl = `${location.origin}${location.pathname}?${params.toString()}`;
@@ -77,12 +113,19 @@
       <div class="algorithm-box">
         <h3>このセットの考え方</h3>
         <ol>
+          <li>診断入口は「${escapeHtml(ENTRY_LABELS[values.entry] || ENTRY_LABELS.none)}」として扱い、内部では生体提案と用品提案を分けて判定します。</li>
           <li>飼いたい魚・ヒーター可否・置き場所から、無理の少ない水槽プランを選びます。</li>
           <li>予算感に合わせて「最小・標準・余裕」のうち、今の条件に近い1案を先に表示します。</li>
           <li>水槽セットに同梱されがちな用品は、買う前に販売ページで重複がないか確認してください。</li>
           <li>価格やレビューは変動するため、購入前に販売ページの最新情報を確認してください。</li>
         </ol>
       </div>
+      <section class="life-section">
+        <h3>生体候補（理由つき）</h3>
+        <p class="small-note">最初は少数導入を前提にしています。水槽の立ち上げ直後は特に保守的に運用してください。</p>
+        <p><strong>この条件で飼いやすい候補：</strong>${speciesAdvice.recommended.map(escapeHtml).join(' / ')}</p>
+        <p><strong>この条件では避けたい候補：</strong>${speciesAdvice.avoid.map(escapeHtml).join(' / ')}</p>
+      </section>
       ${plan.warnings.map((w) => `<p class="notice-line">⚠️ ${escapeHtml(w)}</p>`).join('')}
       <div class="save-box">
         <p><strong>この診断結果を保存</strong></p>
@@ -204,7 +247,7 @@
   function hydrateFromQuery() {
     const qs = new URLSearchParams(location.search);
     let has = false;
-    ['desired', 'budget', 'space', 'care', 'heater'].forEach((name) => {
+    ['entry', 'desired', 'budget', 'space', 'care', 'heater'].forEach((name) => {
       const value = qs.get(name);
       if (value) {
         const input = form.querySelector(`[name="${name}"][value="${CSS.escape(value)}"]`);
