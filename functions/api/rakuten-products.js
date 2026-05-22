@@ -216,9 +216,9 @@ const RECIPES = {
   }),
   food_medaka: R('メダカの餌', '餌', 'メダカ 餌', {
     ng: [...BASE_REJECT, ...FOOD_CONFUSER_REJECT, '冷凍', '大型魚', '鯉'].join(' '),
-    queries: ['メダカ 餌', 'メダカ フード', 'めだか 餌', 'メダカの餌'],
-    mustGroups: [['餌', 'エサ', 'フード', '飼料'], ['メダカ', 'めだか']],
-    plus: ['メダカ', 'めだか', '顆粒', '浮上性', '成魚'],
+    queries: ['メダカ 餌', 'めだか 餌', 'メダカ フード', 'メダカ 飼料', 'メダカ 主食', 'メダカの餌'],
+    mustGroups: [['餌', 'エサ', 'フード', '飼料', '主食'], ['メダカ', 'めだか']],
+    plus: ['メダカ', 'めだか', '餌', 'エサ', 'フード', '飼料', '主食', '顆粒', '浮上性', '成魚'],
     minPrice: 200,
     maxPrice: 2000,
     why: 'ヒーターなし候補のメダカ水槽向け。',
@@ -409,6 +409,31 @@ function scoreItem(item, recipe) {
   return score;
 }
 
+function scoreFoodMedaka(item) {
+  const text = norm(`${item.itemName || ''} ${item.shopName || ''}`);
+  const medakaTerms = ['メダカ', 'めだか'];
+  const foodTerms = ['餌', 'エサ', 'フード', '飼料', '主食'];
+  const rejectTerms = ['psb', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', '生体', '死着', '卵', '稚魚', 'ソイル', '水草', '飼育セット', '水槽セット'];
+
+  if (rejectTerms.some((term) => includesTerm(text, term))) return -999;
+  if (!matchesAny(text, medakaTerms)) return -999;
+
+  let score = 0;
+  if (matchesAny(text, foodTerms)) score += 14;
+  else score += 4;
+
+  score += 8;
+  if (includesTerm(text, 'メダカ')) score += 2;
+  if (includesTerm(text, 'めだか')) score += 2;
+  if (includesTerm(text, '稚魚')) score -= 6;
+  if (includesTerm(text, '卵')) score -= 6;
+
+  score += Math.min(item.reviewCount || 0, 150) / 40;
+  score += Math.max(0, (item.reviewAverage || 0) - 3) * 0.7;
+  if (item.postageFlag === 0) score += 0.4;
+  return score;
+}
+
 function apiNgKeyword(recipeId, recipe) {
   if (['tank_20', 'tank_30', 'tank_45', 'tank_60'].includes(recipeId)) {
     return ['中古', '訳あり', 'ジャンク', '空容器', '標本', 'フィギュア', 'ぬいぐるみ', '金魚鉢', 'メダカ鉢', 'プラケース', '虫かご'].join(' ');
@@ -518,6 +543,18 @@ function fallbackItems(normalizedItems, recipe, recipeId) {
   });
 }
 
+function fallbackFoodMedakaItems(normalizedItems, recipe) {
+  return normalizedItems.filter((item) => {
+    const text = norm(`${item.itemName || ''} ${item.shopName || ''}`);
+    const hardRejects = ['psb', 'バクテリア', 'カルキ抜き', '塩素中和', '中和剤', '水質調整', '生体', '死着', '卵', '稚魚', 'ソイル', '水草', '飼育セット', '水槽セット'];
+    if (hardRejects.some((term) => includesTerm(text, term))) return false;
+    if (!matchesAny(text, ['メダカ', 'めだか'])) return false;
+    if (recipe.minPrice && item.itemPrice < recipe.minPrice) return false;
+    if (recipe.maxPrice && item.itemPrice > recipe.maxPrice) return false;
+    return true;
+  });
+}
+
 async function searchOne(recipeId, mode, env, request) {
   const recipe = RECIPES[recipeId];
   if (!recipe) return { recipeId, ok: false, error: 'unknown_recipe' };
@@ -566,11 +603,17 @@ async function searchOne(recipeId, mode, env, request) {
     return { recipeId, ok: false, status: firstError.status, recipe: publicRecipe(recipeId), error: firstError.error };
   }
 
+  const scorer = recipeId === 'food_medaka'
+    ? (item) => scoreFoodMedaka(item)
+    : (item) => scoreItem(item, recipe);
   const scoredItems = normalizedItems
-    .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
+    .map((item) => ({ ...item, _score: scorer(item) }))
     .filter((item) => item._score > 0);
-  const softItems = fallbackItems(normalizedItems, recipe, recipeId)
-    .map((item) => ({ ...item, _score: Math.max(0.1, scoreItem(item, recipe)) }));
+  const softBaseItems = recipeId === 'food_medaka'
+    ? fallbackFoodMedakaItems(normalizedItems, recipe)
+    : fallbackItems(normalizedItems, recipe, recipeId);
+  const softItems = softBaseItems
+    .map((item) => ({ ...item, _score: Math.max(0.1, scorer(item)) }));
   const finalPool = scoredItems.length ? scoredItems : softItems;
   const finalItems = finalPool.length ? finalPool : normalizedItems.map((item) => ({ ...item, _score: 0.1 }));
   const items = sortLocally(dedupeItems(finalItems), mode).slice(0, 4).map(({ _score, ...item }) => item);
