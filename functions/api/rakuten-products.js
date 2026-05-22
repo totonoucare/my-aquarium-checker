@@ -579,6 +579,9 @@ async function searchOne(recipeId, mode, env, request) {
   if (cached) return await cached.json();
 
   const queryList = unique([recipe.query, ...(recipe.queries || [])]);
+  const preScorer = recipeId === 'food_medaka'
+    ? (item) => scoreFoodMedaka(item)
+    : (item) => scoreItem(item, recipe);
   let normalizedItems = [];
   let firstError = null;
   let usedQueryCount = 0;
@@ -592,7 +595,7 @@ async function searchOne(recipeId, mode, env, request) {
     } else {
       normalizedItems = normalizedItems.concat(result.items);
       const enough = normalizedItems
-        .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
+        .map((item) => ({ ...item, _score: preScorer(item) }))
         .filter((item) => item._score > 0);
       if (dedupeItems(enough).length >= 4) break;
     }
@@ -603,9 +606,7 @@ async function searchOne(recipeId, mode, env, request) {
     return { recipeId, ok: false, status: firstError.status, recipe: publicRecipe(recipeId), error: firstError.error };
   }
 
-  const scorer = recipeId === 'food_medaka'
-    ? (item) => scoreFoodMedaka(item)
-    : (item) => scoreItem(item, recipe);
+  const scorer = preScorer;
   const scoredItems = normalizedItems
     .map((item) => ({ ...item, _score: scorer(item) }))
     .filter((item) => item._score > 0);
