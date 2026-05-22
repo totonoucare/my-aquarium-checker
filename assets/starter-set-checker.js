@@ -6,6 +6,21 @@
     standard: '初心者が後悔しにくいバランス型。管理用品・水温確認まで含める。',
     premium: '買い直しを減らし、見た目・管理のしやすさまで最初から整える。'
   };
+
+  const SPECIES_RULES = {
+    live_betta: { name: 'ベタ', heater: 'required', minTank: 20, style: 'single', avoidWhen: [] },
+    live_neon: { name: 'ネオンテトラ', heater: 'required', minTank: 30, style: 'school', avoidWhen: [] },
+    live_green_neon_tetra: { name: 'グリーンネオンテトラ', heater: 'required', minTank: 30, style: 'school', avoidWhen: [] },
+    live_guppy: { name: 'グッピー/プラティ', heater: 'recommended', minTank: 30, style: 'group', avoidWhen: [] },
+    live_medaka: { name: 'メダカ', heater: 'optional', minTank: 20, style: 'group', avoidWhen: [] },
+    live_minami: { name: 'ミナミヌマエビ', heater: 'optional', minTank: 20, style: 'utility', avoidWhen: [] },
+    live_yamato: { name: 'ヤマトヌマエビ', heater: 'recommended', minTank: 30, style: 'utility', avoidWhen: [] },
+    live_corydoras: { name: 'コリドラス', heater: 'required', minTank: 30, style: 'bottom', avoidWhen: [] },
+    live_otocinclus: { name: 'オトシンクルス', heater: 'required', minTank: 30, style: 'utility', avoidWhen: [] },
+    live_rasbora: { name: 'ラスボラ', heater: 'required', minTank: 30, style: 'school', avoidWhen: [] },
+    live_white_cloud: { name: 'アカヒレ', heater: 'optional', minTank: 20, style: 'school', avoidWhen: [] }
+  };
+
   const DESIRED_TO_PLAN = {
     unknown: 'shoal', betta: 'betta', shoal: 'shoal', colorful: 'guppy', shrimp: 'shrimp', noheater: 'medaka', big: 'community60'
   };
@@ -40,12 +55,54 @@
     return Number(n || 0).toLocaleString('ja-JP');
   }
 
+  function resolveFishRoleIds(planId, plan) {
+    if (!plan) return [];
+    if (planId === 'betta') return ['live_betta'];
+
+    const ids = [];
+    const push = (id) => { if (id && !ids.includes(id)) ids.push(id); };
+    (plan.fishIds || []).forEach(push);
+    for (const categoryId of (plan.fishCategoryIds || [])) {
+      const category = (DATA.fishCategories || {})[categoryId];
+      (category?.fishIds || []).forEach(push);
+    }
+    return ids.slice(0, 3);
+  }
+
+  function diagnoseSpecies(values, fishRoleIds) {
+    const candidates = [];
+    const avoid = [];
+    for (const id of fishRoleIds) {
+      const rule = SPECIES_RULES[id];
+      if (!rule) continue;
+      const noHeaterConflict = values.heater === 'no' && rule.heater === 'required';
+      const smallSpaceConflict = values.space === 'small' && rule.minTank > 30;
+      if (noHeaterConflict || smallSpaceConflict) {
+        const reason = noHeaterConflict ? 'ヒーター前提' : '必要水槽サイズが大きい';
+        avoid.push({ name: rule.name, reason });
+        continue;
+      }
+      candidates.push({ id, ...rule });
+    }
+    return { candidates: candidates.slice(0, 3), avoid: avoid.slice(0, 3) };
+  }
+
+  function inferCareStyle(values) {
+    if (values.heater === 'no') return '低温〜常温帯を安定運用するスタイル';
+    if (values.care === 'easy') return '管理負担を抑える安定重視スタイル';
+    if (values.desired === 'shoal') return '群泳を楽しむ観賞重視スタイル';
+    return '初心者向けバランス重視スタイル';
+  }
+
   function buildResult(values) {
     const planId = pickPlanId(values);
     const tier = pickTier(values);
     const plan = DATA.plans[planId];
     const roles = plan.tiers[tier] || [];
     const altTiers = ['low', 'standard', 'premium'].filter((t) => t !== tier);
+    const fishRoleIds = resolveFishRoleIds(planId, plan);
+    const speciesDiagnosis = diagnoseSpecies(values, fishRoleIds);
+    const careStyle = inferCareStyle(values);
     const params = new URLSearchParams(values);
     params.set('plan', planId); params.set('tier', tier);
     const saveUrl = `${location.origin}${location.pathname}?${params.toString()}`;
@@ -58,6 +115,10 @@
           <p>${escapeHtml(plan.subtitle)}</p>
         </div>
         <img class="result-fish" src="${escapeHtml(plan.fishImage)}" alt="${escapeHtml(plan.title)}のイメージ" loading="lazy">
+      </div>
+      <div class="algorithm-box">
+        <h3>あなたに合う飼育スタイル</h3>
+        <p>${escapeHtml(careStyle)}</p>
       </div>
       <div class="algorithm-box">
         <h3>このセットの考え方</h3>
@@ -93,9 +154,10 @@
       </section>
       <section class="life-section">
         <h3>生体候補</h3>
+        <p class="small-note"><strong>候補：</strong>${speciesDiagnosis.candidates.map((c) => escapeHtml(c.name)).join(' / ') || '条件に合う候補を探索中'}</p>
+        ${speciesDiagnosis.avoid.length ? `<p class="small-note"><strong>この条件では非推奨：</strong>${speciesDiagnosis.avoid.map((c) => `${escapeHtml(c.name)}（${escapeHtml(c.reason)}）`).join(' / ')}</p>` : ''}
         <p class="small-note">生体は水槽立ち上げ後、少数ずつ迎える前提です。配送条件・死着保証は販売ページで確認してください。</p>
         <div class="fish-product-grid" id="fish-product-grid"></div>
-        <button class="ghost-button" id="load-fish-products" type="button">生体候補も見る</button>
       </section>
       <details class="compare-tiers">
         <summary>他の価格帯も比較する</summary>
@@ -111,12 +173,12 @@
 
     document.getElementById('load-products')?.addEventListener('click', () => loadProducts(roles, 'product-results', document.getElementById('sort-mode')?.value || 'balanced'));
     document.getElementById('sort-mode')?.addEventListener('change', (e) => loadProducts(roles, 'product-results', e.target.value));
-    document.getElementById('load-fish-products')?.addEventListener('click', () => loadProducts(plan.fishIds || [], 'fish-product-grid', 'review'));
     document.getElementById('copy-url')?.addEventListener('click', async () => {
       const input = document.getElementById('save-url');
       try { await navigator.clipboard.writeText(input.value); alert('診断結果URLをコピーしました'); } catch { input.select(); document.execCommand('copy'); }
     });
     loadProducts(roles, 'product-results', 'balanced');
+    loadProducts(fishRoleIds, 'fish-product-grid', 'review');
   }
 
   async function loadProducts(roleIds, targetId, mode) {
@@ -145,13 +207,21 @@
     if (!result.ok) {
       return `<article class="recipe-result"><h4>${escapeHtml(r.label)}</h4><p class="notice-line">商品候補を取得できませんでした。時間をおいて再度お試しください。</p></article>`;
     }
-    const cards = (result.items || []).map(renderProductCard).join('') || `<p class="small-note">条件に合う候補が見つかりませんでした。別の価格帯や条件でも確認してみてください。</p>`;
+    const cards = renderRecipeCards(result.items || []);
     return `<article class="recipe-result">
       <div class="recipe-head"><h4>${escapeHtml(r.label)}</h4><span>${escapeHtml(r.category || '')}</span></div>
       <p class="selection-reason"><strong>なぜ必要？</strong> ${escapeHtml(r.why || '')}</p>
       <p class="small-note"><strong>確認：</strong>${escapeHtml(r.check || '')}</p>
       <div class="product-grid">${cards}</div>
     </article>`;
+  }
+
+  function renderRecipeCards(items) {
+    if (!items.length) return `<p class="small-note">条件に合う候補が見つかりませんでした。別の価格帯や条件でも確認してみてください。</p>`;
+    const first = renderProductCard(items[0]);
+    const rest = items.slice(1).map(renderProductCard).join('');
+    if (!rest) return `<div class="product-grid">${first}</div>`;
+    return `<div class="product-grid">${first}</div><details class="more-products"><summary>他${items.length - 1}件の候補を見る</summary><div class="product-grid">${rest}</div></details>`;
   }
 
   function renderProductCard(item) {
