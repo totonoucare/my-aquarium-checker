@@ -40,12 +40,27 @@
     return Number(n || 0).toLocaleString('ja-JP');
   }
 
+  function resolveFishRoleIds(planId, plan) {
+    if (!plan) return [];
+    if (planId === 'betta') return ['live_betta'];
+
+    const ids = [];
+    const push = (id) => { if (id && !ids.includes(id)) ids.push(id); };
+    (plan.fishIds || []).forEach(push);
+    for (const categoryId of (plan.fishCategoryIds || [])) {
+      const category = (DATA.fishCategories || {})[categoryId];
+      (category?.fishIds || []).forEach(push);
+    }
+    return ids.slice(0, 3);
+  }
+
   function buildResult(values) {
     const planId = pickPlanId(values);
     const tier = pickTier(values);
     const plan = DATA.plans[planId];
     const roles = plan.tiers[tier] || [];
     const altTiers = ['low', 'standard', 'premium'].filter((t) => t !== tier);
+    const fishRoleIds = resolveFishRoleIds(planId, plan);
     const params = new URLSearchParams(values);
     params.set('plan', planId); params.set('tier', tier);
     const saveUrl = `${location.origin}${location.pathname}?${params.toString()}`;
@@ -95,7 +110,6 @@
         <h3>生体候補</h3>
         <p class="small-note">生体は水槽立ち上げ後、少数ずつ迎える前提です。配送条件・死着保証は販売ページで確認してください。</p>
         <div class="fish-product-grid" id="fish-product-grid"></div>
-        <button class="ghost-button" id="load-fish-products" type="button">生体候補も見る</button>
       </section>
       <details class="compare-tiers">
         <summary>他の価格帯も比較する</summary>
@@ -111,12 +125,12 @@
 
     document.getElementById('load-products')?.addEventListener('click', () => loadProducts(roles, 'product-results', document.getElementById('sort-mode')?.value || 'balanced'));
     document.getElementById('sort-mode')?.addEventListener('change', (e) => loadProducts(roles, 'product-results', e.target.value));
-    document.getElementById('load-fish-products')?.addEventListener('click', () => loadProducts(plan.fishIds || [], 'fish-product-grid', 'review'));
     document.getElementById('copy-url')?.addEventListener('click', async () => {
       const input = document.getElementById('save-url');
       try { await navigator.clipboard.writeText(input.value); alert('診断結果URLをコピーしました'); } catch { input.select(); document.execCommand('copy'); }
     });
     loadProducts(roles, 'product-results', 'balanced');
+    loadProducts(fishRoleIds, 'fish-product-grid', 'review');
   }
 
   async function loadProducts(roleIds, targetId, mode) {
@@ -145,13 +159,21 @@
     if (!result.ok) {
       return `<article class="recipe-result"><h4>${escapeHtml(r.label)}</h4><p class="notice-line">商品候補を取得できませんでした。時間をおいて再度お試しください。</p></article>`;
     }
-    const cards = (result.items || []).map(renderProductCard).join('') || `<p class="small-note">条件に合う候補が見つかりませんでした。別の価格帯や条件でも確認してみてください。</p>`;
+    const cards = renderRecipeCards(result.items || []);
     return `<article class="recipe-result">
       <div class="recipe-head"><h4>${escapeHtml(r.label)}</h4><span>${escapeHtml(r.category || '')}</span></div>
       <p class="selection-reason"><strong>なぜ必要？</strong> ${escapeHtml(r.why || '')}</p>
       <p class="small-note"><strong>確認：</strong>${escapeHtml(r.check || '')}</p>
       <div class="product-grid">${cards}</div>
     </article>`;
+  }
+
+  function renderRecipeCards(items) {
+    if (!items.length) return `<p class="small-note">条件に合う候補が見つかりませんでした。別の価格帯や条件でも確認してみてください。</p>`;
+    const first = renderProductCard(items[0]);
+    const rest = items.slice(1).map(renderProductCard).join('');
+    if (!rest) return `<div class="product-grid">${first}</div>`;
+    return `<div class="product-grid">${first}</div><details class="more-products"><summary>他${items.length - 1}件の候補を見る</summary><div class="product-grid">${rest}</div></details>`;
   }
 
   function renderProductCard(item) {
