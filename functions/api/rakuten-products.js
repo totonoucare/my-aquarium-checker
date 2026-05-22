@@ -573,7 +573,7 @@ async function searchOne(recipeId, mode, env, request) {
   }
 
   const origin = new URL(request.url).origin;
-  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=8-safe`, request);
+  const cacheKey = new Request(`${origin}/api/rakuten-products?recipeId=${recipeId}&mode=${mode}&v=9-medaka-food`, request);
   const cache = caches.default;
   const cached = await cache.match(cacheKey);
   if (cached) return await cached.json();
@@ -591,8 +591,11 @@ async function searchOne(recipeId, mode, env, request) {
       if (result.status === 429) break;
     } else {
       normalizedItems = normalizedItems.concat(result.items);
+      const loopScorer = recipeId === 'food_medaka'
+        ? (item) => scoreFoodMedaka(item)
+        : (item) => scoreItem(item, recipe);
       const enough = normalizedItems
-        .map((item) => ({ ...item, _score: scoreItem(item, recipe) }))
+        .map((item) => ({ ...item, _score: loopScorer(item) }))
         .filter((item) => item._score > 0);
       if (dedupeItems(enough).length >= 4) break;
     }
