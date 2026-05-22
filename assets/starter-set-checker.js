@@ -1,4 +1,3 @@
-
 (function () {
   const DATA = window.AQUA_RAKUTEN_RECIPES || { recipes: {}, plans: {} };
   const TIER_LABELS = { low: '最小セット', standard: '標準セット', premium: '余裕セット' };
@@ -10,15 +9,10 @@
   const DESIRED_TO_PLAN = {
     unknown: 'shoal', betta: 'betta', shoal: 'shoal', colorful: 'guppy', shrimp: 'shrimp', noheater: 'medaka', big: 'community60'
   };
-  const SORT_LABELS = { balanced: 'レビュー件数重視', price: '安い順', rating: '高評価順' };
 
   const form = document.getElementById('starter-form');
   const result = document.getElementById('starter-result');
   if (!form || !result) return;
-
-  function valueOf(name) {
-    return new FormData(form).get(name);
-  }
 
   function pickPlanId(values) {
     if (values.heater === 'no' && values.desired !== 'betta' && values.desired !== 'shrimp') return 'medaka';
@@ -75,6 +69,11 @@
         </ol>
       </div>
       ${plan.warnings.map((w) => `<p class="notice-line">⚠️ ${escapeHtml(w)}</p>`).join('')}
+      <div class="save-box">
+        <p><strong>この診断結果を保存</strong></p>
+        <input readonly value="${escapeHtml(saveUrl)}" id="save-url">
+        <button class="ghost-button" id="copy-url" type="button">URLをコピー</button>
+      </div>
       <section class="tier-primary">
         <h3>${TIER_LABELS[tier]}</h3>
         <p>${TIER_SUMMARIES[tier]}</p>
@@ -108,11 +107,6 @@
             <a class="text-link" href="?${new URLSearchParams({...values, budget: t === 'low' ? 'low' : t === 'premium' ? 'premium' : 'standard'}).toString()}">${TIER_LABELS[t]}をメイン表示にする</a>
           </div>`).join('')}
       </details>
-      <div class="save-box">
-        <p><strong>この診断結果を保存</strong></p>
-        <input readonly value="${escapeHtml(saveUrl)}" id="save-url">
-        <button class="ghost-button" id="copy-url" type="button">URLをコピー</button>
-      </div>
     `;
 
     document.getElementById('load-products')?.addEventListener('click', () => loadProducts(roles, 'product-results', document.getElementById('sort-mode')?.value || 'balanced'));
@@ -180,6 +174,9 @@
     const values = Object.fromEntries(new FormData(form).entries());
     buildResult(values);
     history.replaceState(null, '', `${location.pathname}?${new URLSearchParams(values).toString()}`);
+    if (event) {
+      setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
   }
 
   function hydrateFromQuery() {
