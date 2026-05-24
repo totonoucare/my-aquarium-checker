@@ -519,51 +519,51 @@ function gearCard(title, note, href) {
 
 function renderGearForFish(fish) {
   const baseCare = [
-    ["水温計・カルキ抜き", "どの魚でも最初に用意しておきたい基本用品。", "/tools/#care"]
+    ["水温計・カルキ抜き", "どの魚でも最初に用意しておきたい基本用品。", "/comparison/?section=care"]
   ];
 
   let items;
   if (fish.id === "betta") {
     items = [
-      ["ベタ用水槽セット", "単独飼育で始めやすいセット。フタつきだと安心。", "/tools/#starter"],
-      ["ヒーター", "ベタは保温が必要になりやすいため、対応水量を確認。", "/tools/#heater"],
-      ["水流が強すぎないフィルター", "ベタは強い水流が苦手なことがあります。", "/tools/#filter"],
-      ["隠れ家・レイアウト", "ベタが落ち着ける隠れ場所や見た目づくりに。", "/tools/#layout"]
+      ["ベタ用水槽セット", "単独飼育で始めやすいセット。フタつきだと安心。", "/comparison/?section=starter"],
+      ["ヒーター", "ベタは保温が必要になりやすいため、対応水量を確認。", "/comparison/?section=heater"],
+      ["水流が強すぎないフィルター", "ベタは強い水流が苦手なことがあります。", "/comparison/?section=filter"],
+      ["隠れ家・レイアウト", "ベタが落ち着ける隠れ場所や見た目づくりに。", "/comparison/?section=layout"]
     ].concat(baseCare);
   } else if (fish.id === "angelfish") {
     items = [
-      ["60cm水槽セット", "成長後のサイズを考えると60cm以上から検討したい魚。", "/tools/#starter"],
-      ["40〜60cm向けフィルター", "水量と魚の大きさに合わせてろ過に余裕を。", "/tools/#filter"],
-      ["60cm向けLED", "大きめ水槽をきれいに見せたい場合に。", "/tools/#light"],
-      ["熱帯魚の餌", "口のサイズや混泳相手に合わせて選びます。", "/tools/#food"]
+      ["60cm水槽セット", "成長後のサイズを考えると60cm以上から検討したい魚。", "/comparison/?section=starter"],
+      ["40〜60cm向けフィルター", "水量と魚の大きさに合わせてろ過に余裕を。", "/comparison/?section=filter"],
+      ["60cm向けLED", "大きめ水槽をきれいに見せたい場合に。", "/comparison/?section=light"],
+      ["熱帯魚の餌", "口のサイズや混泳相手に合わせて選びます。", "/comparison/?section=food"]
     ].concat(baseCare);
   } else if (fish.id === "corydoras") {
     items = [
-      ["45cm水槽セット", "底ものを入れるなら底面スペースに余裕を持ちたいです。", "/tools/#starter"],
-      ["コリドラス用タブレット", "底に沈む餌があると食べさせやすいです。", "/tools/#food"],
-      ["水換え・底砂掃除用品", "底砂に汚れがたまりやすいので掃除道具が便利。", "/tools/#care"],
-      ["フィルター", "底ものを入れる水槽でも水質安定のために用意。", "/tools/#filter"]
+      ["45cm水槽セット", "底ものを入れるなら底面スペースに余裕を持ちたいです。", "/comparison/?section=starter"],
+      ["コリドラス用タブレット", "底に沈む餌があると食べさせやすいです。", "/comparison/?section=food"],
+      ["水換え・底砂掃除用品", "底砂に汚れがたまりやすいので掃除道具が便利。", "/comparison/?section=care"],
+      ["フィルター", "底ものを入れる水槽でも水質安定のために用意。", "/comparison/?section=filter"]
     ].concat(baseCare);
   } else if (["minami", "redcherry", "yamato"].includes(fish.id)) {
     items = [
-      ["30cm水槽セット", "エビ水槽を小さく始めたい人向け。", "/tools/#starter"],
-      ["水作系フィルター", "稚エビの吸い込み対策を意識したい場合に。", "/tools/#filter"],
-      ["LEDライト", "水草や隠れ家を楽しむならライトがあると便利。", "/tools/#light"],
-      ["隠れ家・レイアウト", "エビや小型魚の隠れ場所づくりに。", "/tools/#layout"],
-      ["底もの・エビ向け餌", "エビに届きやすい沈む餌が使いやすいです。", "/tools/#food"]
+      ["30cm水槽セット", "エビ水槽を小さく始めたい人向け。", "/comparison/?section=starter"],
+      ["水作系フィルター", "稚エビの吸い込み対策を意識したい場合に。", "/comparison/?section=filter"],
+      ["LEDライト", "水草や隠れ家を楽しむならライトがあると便利。", "/comparison/?section=light"],
+      ["隠れ家・レイアウト", "エビや小型魚の隠れ場所づくりに。", "/comparison/?section=layout"],
+      ["底もの・エビ向け餌", "エビに届きやすい沈む餌が使いやすいです。", "/comparison/?section=food"]
     ].concat(baseCare);
   } else if (["medaka", "whitecloud"].includes(fish.id)) {
     items = [
-      ["30cm水槽セット", "ヒーターなし構成でも始めやすいサイズ。", "/tools/#starter"],
-      ["フィルター", "シンプル飼育でも水を安定させやすくなります。", "/tools/#filter"],
-      ["掃除用品", "水換えを楽にできると続けやすいです。", "/tools/#care"]
+      ["30cm水槽セット", "ヒーターなし構成でも始めやすいサイズ。", "/comparison/?section=starter"],
+      ["フィルター", "シンプル飼育でも水を安定させやすくなります。", "/comparison/?section=filter"],
+      ["掃除用品", "水換えを楽にできると続けやすいです。", "/comparison/?section=care"]
     ].concat(baseCare);
   } else {
     items = [
-      ["30cm〜45cm水槽セット", "小型熱帯魚なら、魚数に合わせて30〜45cmを検討。", "/tools/#starter"],
-      ["外掛けフィルター", "初心者でも扱いやすい定番のろ過用品。", "/tools/#filter"],
-      ["ヒーター", "熱帯魚は保温が必要になりやすいです。", "/tools/#heater"],
-      ["熱帯魚の餌", "魚の口のサイズに合う餌を選びます。", "/tools/#food"]
+      ["30cm〜45cm水槽セット", "小型熱帯魚なら、魚数に合わせて30〜45cmを検討。", "/comparison/?section=starter"],
+      ["外掛けフィルター", "初心者でも扱いやすい定番のろ過用品。", "/comparison/?section=filter"],
+      ["ヒーター", "熱帯魚は保温が必要になりやすいです。", "/comparison/?section=heater"],
+      ["熱帯魚の餌", "魚の口のサイズに合う餌を選びます。", "/comparison/?section=food"]
     ].concat(baseCare);
   }
 
@@ -630,7 +630,7 @@ function render() {
       <a class="button" href="/starter-set-checker/?plan=${starterPlanFromFish(ranked[0])}">1位候補のスターターセットを見る</a>
       <a class="button secondary" href="/fish-combination-checker/">混泳相性をチェック</a>
       <a class="button secondary" href="/fish/">魚カードを見る</a>
-      <a class="button secondary" href="/tools/">必要グッズ一覧</a>
+      <a class="button secondary" href="/comparison/">必要グッズ一覧</a>
     </div>
   `;
 }
