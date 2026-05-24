@@ -113,7 +113,7 @@
       <div class="algorithm-box">
         <h3>このセットの考え方</h3>
         <ol>
-          <li>診断入口は「${escapeHtml(ENTRY_LABELS[values.entry] || ENTRY_LABELS.none)}」として扱い、内部では生体提案と用品提案を分けて判定します。</li>
+          <li>診断入口「${escapeHtml(ENTRY_LABELS[values.entry] || ENTRY_LABELS.none)}」に合わせて、生体候補と用品セットの提案バランスを調整しています。</li>
           <li>飼いたい魚・ヒーター可否・置き場所から、無理の少ない水槽プランを選びます。</li>
           <li>予算感に合わせて「最小・標準・余裕」のうち、今の条件に近い1案を先に表示します。</li>
           <li>水槽セットに同梱されがちな用品は、買う前に販売ページで重複がないか確認してください。</li>
