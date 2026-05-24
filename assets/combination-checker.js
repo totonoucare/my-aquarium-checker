@@ -443,37 +443,37 @@ function renderGearForCombination(ids, minTank, needsHeater) {
   const items = [];
 
   if (hasBetta) {
-    items.push(["ベタ用水槽セット", "ベタは単独飼育寄り。混泳より専用水槽を検討しやすいです。", "/tools/#starter"]);
-    items.push(["ベタ向けの隠れ家", "単独飼育でも隠れ場所があると落ち着きやすくなります。", "/tools/#layout"]);
+    items.push(["ベタ用水槽セット", "ベタは単独飼育寄り。混泳より専用水槽を検討しやすいです。", "/comparison/?section=starter"]);
+    items.push(["ベタ向けの隠れ家", "単独飼育でも隠れ場所があると落ち着きやすくなります。", "/comparison/?section=layout"]);
   } else if (hasAngelfish || minTank >= 60) {
-    items.push(["60cm水槽セット", "大きめの魚や魚数が多い組み合わせは60cm以上から検討。", "/tools/#starter"]);
+    items.push(["60cm水槽セット", "大きめの魚や魚数が多い組み合わせは60cm以上から検討。", "/comparison/?section=starter"]);
   } else if (minTank >= 45) {
-    items.push(["45cm水槽セット", "小型魚の混泳を少し余裕を持って始めやすいサイズ。", "/tools/#starter"]);
+    items.push(["45cm水槽セット", "小型魚の混泳を少し余裕を持って始めやすいサイズ。", "/comparison/?section=starter"]);
   } else {
-    items.push(["30cm水槽セット", "少数の小型魚・エビから始める場合に検討しやすいサイズ。", "/tools/#starter"]);
+    items.push(["30cm水槽セット", "少数の小型魚・エビから始める場合に検討しやすいサイズ。", "/comparison/?section=starter"]);
   }
 
   if (hasAngelfish || minTank >= 45) {
-    items.push(["40〜60cm向けフィルター", "魚数や水量に合わせて、ろ過に余裕を持ちたい組み合わせ。", "/tools/#filter"]);
+    items.push(["40〜60cm向けフィルター", "魚数や水量に合わせて、ろ過に余裕を持ちたい組み合わせ。", "/comparison/?section=filter"]);
   } else {
-    items.push(["小型水槽向けフィルター", "少数飼育でも水質を安定させるために用意したい用品。", "/tools/#filter"]);
+    items.push(["小型水槽向けフィルター", "少数飼育でも水質を安定させるために用意したい用品。", "/comparison/?section=filter"]);
   }
 
   if (needsHeater) {
-    items.push(["ヒーター", "熱帯魚を含む場合は保温が必要になりやすいです。", "/tools/#heater"]);
+    items.push(["ヒーター", "熱帯魚を含む場合は保温が必要になりやすいです。", "/comparison/?section=heater"]);
   }
 
-  items.push(["水温計・カルキ抜き", "水温確認と水道水処理は、どの組み合わせでも基本になります。", "/tools/#care"]);
+  items.push(["水温計・カルキ抜き", "水温確認と水道水処理は、どの組み合わせでも基本になります。", "/comparison/?section=care"]);
 
   if (hasCory) {
-    items.push(["コリドラス用タブレット", "底ものには沈む餌があると食べさせやすいです。", "/tools/#food"]);
-    items.push(["水換え・底砂掃除用品", "底砂の汚れを掃除しやすい道具があると便利。", "/tools/#care"]);
+    items.push(["コリドラス用タブレット", "底ものには沈む餌があると食べさせやすいです。", "/comparison/?section=food"]);
+    items.push(["水換え・底砂掃除用品", "底砂の汚れを掃除しやすい道具があると便利。", "/comparison/?section=care"]);
   } else if (hasShrimp) {
-    items.push(["底もの・エビ向け餌", "エビや底ものに届きやすい沈む餌が便利です。", "/tools/#food"]);
-    items.push(["隠れ家・レイアウト", "エビや底ものが落ち着ける場所を作りたい場合に。", "/tools/#layout"]);
-    items.push(["LEDライト", "水草や隠れ家を入れるなら見た目も管理もしやすいです。", "/tools/#light"]);
+    items.push(["底もの・エビ向け餌", "エビや底ものに届きやすい沈む餌が便利です。", "/comparison/?section=food"]);
+    items.push(["隠れ家・レイアウト", "エビや底ものが落ち着ける場所を作りたい場合に。", "/comparison/?section=layout"]);
+    items.push(["LEDライト", "水草や隠れ家を入れるなら見た目も管理もしやすいです。", "/comparison/?section=light"]);
   } else if (hasSmallFish) {
-    items.push(["熱帯魚の餌", "小型魚の口のサイズに合う餌を選びます。", "/tools/#food"]);
+    items.push(["熱帯魚の餌", "小型魚の口のサイズに合う餌を選びます。", "/comparison/?section=food"]);
   }
 
   return `
@@ -598,7 +598,7 @@ function check() {
     <div class="button-row">
       <a class="button" href="/fish-recommend-checker/">魚えらび診断へ</a>
       <a class="button secondary" href="/fish/">魚カードを見る</a>
-      <a class="button secondary" href="/tools/">必要グッズを見る</a>
+      <a class="button secondary" href="/comparison/">必要グッズを見る</a>
     </div>
   `;
 }
